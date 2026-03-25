@@ -3,412 +3,258 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Localization Assistant | Day 1: The Metacrisis</title>
+    <title>The Localization Assistant | Day 1 Quest</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Lora:ital,wght@0,400;0,700;1,400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Lora:ital,wght@0,400;0,700;1,400;1,700&display=swap');
         
         :root {
-            --earth-900: #1a1512;
-            --leaf-600: #3a5a40;
-            --leaf-500: #588157;
-            --water-500: #34a0a4;
-            --clay-600: #ea580c; 
-            --clay-700: #c2410c;
+            --stone-950: #0c0a09;
+            --orange-600: #ea580c;
+            --leaf-600: #166534;
         }
 
         body {
             font-family: 'Inter', sans-serif;
             background-color: #fdfaf7;
-            color: var(--earth-900);
+            color: #1c1917;
         }
 
         .serif { font-family: 'Lora', serif; }
 
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(58, 90, 64, 0.1);
+        .quest-card {
+            background: white;
+            border: 2px solid #e7e5e4;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .chat-bubble-user {
-            background-color: var(--leaf-500);
+        .quest-card:hover {
+            border-color: var(--orange-600);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-step-active {
+            background-color: var(--orange-600);
             color: white;
-            border-radius: 1.5rem 1.5rem 0 1.5rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 0 15px rgba(234, 88, 12, 0.4);
         }
 
-        .chat-bubble-ai {
-            background-color: #ffffff;
-            color: var(--earth-900);
-            border-radius: 1.5rem 1.5rem 1.5rem 0;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        /* Apple Seed Animation */
+        @keyframes slurp {
+            0% { transform: scaleY(1); }
+            100% { transform: scaleY(0.1); transform-origin: bottom; }
         }
-
-        /* MAX CONTRAST ACTIVATION OVERLAY */
-        .activation-blackout {
-            background-color: #000000; 
-            color: #ffffff;
-        }
-
-        .high-contrast-input {
-            background-color: #ffffff !important;
-            color: #000000 !important;
-            border: 4px solid #ea580c !important;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .animate-fade { animation: fadeIn 0.5s ease-out forwards; }
+        .slurping { animation: slurp 5s linear forwards; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <!-- Navigation -->
-    <nav class="sticky top-0 z-50 glass-panel border-b-2 border-stone-200 px-4 py-4">
+    <!-- Header -->
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b-2 border-stone-200 px-6 py-4">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="bg-stone-900 p-2 rounded-xl text-white shadow-lg">
+                <div class="bg-stone-900 p-2 rounded-lg text-white">
                     <i data-lucide="mountain"></i>
                 </div>
-                <h1 class="text-2xl font-black tracking-tighter text-stone-900">THE LOCALIZATION ASSISTANT</h1>
+                <h1 class="text-xl font-black tracking-tighter uppercase">Localization Quest</h1>
             </div>
-            <div class="hidden md:flex gap-8 text-sm font-black text-stone-500 uppercase tracking-widest">
-                <button onclick="switchTab('explorer')" class="hover:text-orange-600 transition-colors">Study Guide</button>
-                <button onclick="switchTab('assistant')" class="hover:text-orange-600 transition-colors">AI Mentor</button>
-                <button onclick="switchTab('action')" class="hover:text-orange-600 transition-colors">Action Map</button>
-            </div>
-            <div class="bg-orange-600 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-white">
-                DAY 1 FOUNDATIONS
+            <div class="flex items-center gap-4">
+                <div class="hidden md:flex gap-1">
+                    <div class="h-2 w-8 rounded-full progress-step-active"></div>
+                    <div class="h-2 w-8 rounded-full bg-stone-200"></div>
+                    <div class="h-2 w-8 rounded-full bg-stone-200"></div>
+                    <div class="h-2 w-8 rounded-full bg-stone-200"></div>
+                    <div class="h-2 w-8 rounded-full bg-stone-200"></div>
+                </div>
+                <span class="text-[10px] font-black uppercase text-orange-600 tracking-widest">Day 1 of 5</span>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="flex-grow max-w-6xl mx-auto w-full p-4 md:p-10">
+    <main class="flex-grow max-w-5xl mx-auto w-full p-6 md:p-12">
         
-        <header class="mb-14 animate-fade">
-            <div class="flex items-center gap-3 mb-3">
-                <span class="text-orange-600 font-black uppercase tracking-[0.3em] text-xs">Foundation Series</span>
-                <span class="h-1 w-16 bg-orange-200 rounded-full"></span>
-            </div>
-            <h2 class="text-5xl md:text-7xl font-black serif mb-6 leading-tight text-stone-900 tracking-tight">Dancing with the <br><span class="text-orange-600">Global Elephant</span></h2>
-            <p class="text-2xl text-stone-600 max-w-4xl leading-relaxed italic border-l-8 border-orange-500 pl-8">
-                Day 1 Study: Shifting from individual self-help to collective systems-health.
+        <!-- Day 1 Context -->
+        <header class="mb-12">
+            <h2 class="text-4xl md:text-6xl font-black serif mb-6 leading-tight">The Global Shadow</h2>
+            <p class="text-xl text-stone-600 max-w-3xl leading-relaxed">
+                Before we can build a new world, we must stop lying about the current one. Today is about <strong>Truth-Telling</strong>.
             </p>
         </header>
 
-        <!-- Study Guide Tab -->
-        <div id="explorer-tab" class="tab-content animate-fade">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
-                <div class="lg:col-span-1 space-y-6">
-                    <div class="glass-panel rounded-[2rem] p-8 shadow-2xl border-2 border-stone-100">
-                        <h3 class="font-black text-xl mb-6 flex items-center gap-3 text-stone-800 uppercase tracking-tighter">
-                            <i data-lucide="layers" class="text-orange-600"></i> Day 1 Modules
-                        </h3>
-                        <ul class="space-y-4">
-                            <li class="p-6 bg-white rounded-2xl border-l-[12px] border-orange-600 hover:bg-stone-50 cursor-pointer transition-all shadow-lg" onclick="showTopic('elephant')">
-                                <span class="block font-black text-base text-stone-900 uppercase tracking-tight">1. THE ELEPHANT EXPANDS</span>
-                                <span class="text-xs text-stone-500 font-bold mt-1 block">From private secrets to global shadow.</span>
-                            </li>
-                            <li class="p-6 bg-white rounded-2xl border-l-[12px] border-stone-200 hover:border-orange-600 cursor-pointer transition-all shadow-lg" onclick="showTopic('everest')">
-                                <span class="block font-black text-base text-stone-900 uppercase tracking-tight">2. MOUNT EVEREST ANALOGY</span>
-                                <span class="text-xs text-stone-500 font-bold mt-1 block">Defining the scale of the crisis.</span>
-                            </li>
-                            <li class="p-6 bg-white rounded-2xl border-l-[12px] border-stone-200 hover:border-orange-600 cursor-pointer transition-all shadow-lg" onclick="showTopic('overshoot')">
-                                <span class="block font-black text-base text-stone-900 uppercase tracking-tight">3. THE APPLE SEED</span>
-                                <span class="text-xs text-stone-500 font-bold mt-1 block">Ecological Overshoot explained.</span>
-                            </li>
-                            <li class="p-6 bg-white rounded-2xl border-l-[12px] border-stone-200 hover:border-orange-600 cursor-pointer transition-all shadow-lg" onclick="showTopic('growth')">
-                                <span class="block font-black text-base text-stone-900 uppercase tracking-tight">4. THE GROWTH LIE</span>
-                                <span class="text-xs text-stone-500 font-bold mt-1 block">Why "Infinite Growth" is a myth.</span>
-                            </li>
-                        </ul>
-                    </div>
-                    <div id="vocab-cloud" class="flex flex-wrap gap-2 glass-panel p-6 rounded-3xl border border-stone-200"></div>
+        <!-- Module Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            
+            <!-- Quest 1: The Elephant Inventory -->
+            <div class="quest-card rounded-[2rem] p-8 flex flex-col">
+                <div class="bg-orange-100 text-orange-700 w-12 h-12 rounded-2xl flex items-center justify-center mb-6">
+                    <i data-lucide="eye"></i>
                 </div>
-
-                <div class="lg:col-span-2">
-                    <div id="topic-display" class="glass-panel rounded-[3rem] p-10 md:p-16 shadow-2xl min-h-[600px] border border-stone-200">
-                        <div class="bg-orange-50 h-80 rounded-[2.5rem] mb-12 flex flex-col items-center justify-center text-orange-700 p-12 text-center border-4 border-orange-100 shadow-inner">
-                            <i data-lucide="mountain" size="100" class="mb-8 opacity-20 text-orange-900"></i>
-                            <h4 class="font-black text-4xl serif italic text-stone-900 leading-tight">Face the mountain. <br>Transform the world.</h4>
-                        </div>
-                        <h3 class="text-5xl font-black serif mb-8 text-stone-900">Start the Day 1 Journey</h3>
-                        <p class="text-stone-600 leading-relaxed text-2xl font-medium mb-12">
-                            Select a module to begin the transition from <strong>Self-Help</strong> to <strong>Systems-Health</strong>.
-                        </p>
-                        <div class="p-12 bg-stone-900 rounded-[3rem] text-white shadow-2xl border-b-[16px] border-orange-900">
-                            <p class="text-xs uppercase tracking-[0.5em] text-orange-500 mb-6 font-black">Day 1 Key Insight</p>
-                            <p class="text-4xl serif italic leading-tight text-stone-100">"Infinite growth on a finite planet is the lie the Elephant is tired of."</p>
-                        </div>
-                    </div>
-                </div>
+                <h3 class="text-2xl font-black uppercase tracking-tight mb-2">The Town Square Elephant</h3>
+                <p class="text-stone-600 mb-6 font-medium">In the past, the Elephant was your private secrets. Today, it is our collective dependency on failing systems.</p>
+                <button onclick="openModal('elephant-inventory')" class="mt-auto bg-stone-900 text-white font-black py-4 rounded-xl hover:bg-black transition-all uppercase tracking-widest text-xs">Start Inventory</button>
             </div>
+
+            <!-- Quest 2: Apple Seed Simulator -->
+            <div class="quest-card rounded-[2rem] p-8 flex flex-col">
+                <div class="bg-red-100 text-red-700 w-12 h-12 rounded-2xl flex items-center justify-center mb-6">
+                    <i data-lucide="apple"></i>
+                </div>
+                <h3 class="text-2xl font-black uppercase tracking-tight mb-2">The Apple Seed Lab</h3>
+                <p class="text-stone-600 mb-6 font-medium">Visualizing <strong>Ecological Overshoot</strong>. Are we living off the interest, or liquidating the capital?</p>
+                <button onclick="openModal('apple-seed-lab')" class="mt-auto bg-stone-900 text-white font-black py-4 rounded-xl hover:bg-black transition-all uppercase tracking-widest text-xs">Launch Simulator</button>
+            </div>
+
         </div>
 
-        <!-- AI Assistant Tab -->
-        <div id="assistant-tab" class="hidden tab-content animate-fade">
-            <div class="max-w-4xl mx-auto glass-panel rounded-[3.5rem] overflow-hidden shadow-2xl border-4 border-stone-200 h-[82vh] flex flex-col relative">
+        <!-- The Day 1 Integration Form -->
+        <section class="bg-stone-900 text-white rounded-[3rem] p-8 md:p-16 shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-12 opacity-10">
+                <i data-lucide="shield-alert" size="200"></i>
+            </div>
+            <div class="relative z-10">
+                <h3 class="text-3xl md:text-5xl font-black serif mb-6">Day 1 Reality Check</h3>
+                <p class="text-stone-400 text-lg mb-10 max-w-2xl">Capture your Day 1 insights here. This will form the foundation of your <strong>Bioregional Action Map</strong>.</p>
                 
-                <!-- ACTIVATION OVERLAY (MAX CONTRAST - BLACK BACKGROUND) -->
-                <div id="activation-overlay" class="absolute inset-0 z-50 activation-blackout flex flex-col items-center justify-center p-10 text-center transition-opacity duration-500">
-                    <div class="bg-orange-600 p-8 rounded-full mb-12 shadow-[0_0_50px_rgba(234,88,12,0.6)]">
-                        <i data-lucide="key" size="64" class="text-white"></i>
+                <div class="space-y-8 max-w-2xl">
+                    <div class="space-y-3">
+                        <label class="block text-xs font-black text-orange-500 uppercase tracking-[0.3em]">The System I Rely On</label>
+                        <input type="text" id="user-system" placeholder="e.g. The Global Food Chain" class="w-full bg-stone-800 border-2 border-stone-700 p-5 rounded-2xl text-xl font-bold focus:border-orange-500 outline-none">
                     </div>
-                    <h3 class="text-6xl font-black serif mb-6 tracking-tighter uppercase text-white">ACTIVATE MENTOR</h3>
-                    <p class="text-stone-300 text-2xl max-w-2xl mb-14 leading-relaxed font-bold">
-                        Provide your <span class="text-orange-500 underline decoration-8 underline-offset-8">Google Gemini API Key</span> to connect with the core archives.
-                    </p>
-                    
-                    <div class="w-full max-w-xl space-y-10 bg-stone-900 p-12 rounded-[3rem] border-4 border-stone-700 shadow-2xl">
-                        <div class="space-y-4 text-left">
-                            <label class="block text-sm font-black text-orange-500 uppercase tracking-[0.3em] ml-4">Paste API Key Below</label>
-                            <input type="password" id="api-key-input" placeholder="Paste Gemini Key Here..." class="high-contrast-input w-full p-8 rounded-3xl text-center font-mono text-2xl font-black focus:outline-none focus:ring-[16px] focus:ring-orange-600 shadow-2xl transition-all">
-                        </div>
-                        <button id="activate-btn" onclick="testAndActivate()" class="w-full bg-orange-600 hover:bg-orange-500 text-white py-10 rounded-3xl font-black text-4xl tracking-tighter transition-all shadow-2xl hover:scale-[1.05] active:scale-95 flex items-center justify-center gap-6 border-b-[12px] border-orange-800">
-                            <span>ACTIVATE NOW</span>
-                            <i data-lucide="zap" size="40"></i>
-                        </button>
-                        <p id="test-feedback" class="p-6 rounded-2xl bg-red-600 text-white font-black text-base hidden shadow-2xl"></p>
+                    <div class="space-y-3">
+                        <label class="block text-xs font-black text-orange-500 uppercase tracking-[0.3em]">The "Slurping Sound"</label>
+                        <p class="text-sm text-stone-400 italic">How is this system currently "eating the seed" (consuming capital)?</p>
+                        <textarea id="user-overshoot" class="w-full bg-stone-800 border-2 border-stone-700 p-5 rounded-2xl h-40 text-lg outline-none focus:border-orange-500"></textarea>
                     </div>
-                    <a href="https://aistudio.google.com/app/apikey" target="_blank" class="mt-12 block text-base text-stone-400 font-black underline hover:text-white transition-colors uppercase tracking-[0.4em]">Get keys at Google AI Studio &rarr;</a>
-                </div>
-
-                <!-- Chat UI -->
-                <div class="bg-stone-950 p-8 text-white flex items-center justify-between border-b-4 border-white/5">
-                    <div class="flex items-center gap-6">
-                        <div class="bg-orange-600 p-4 rounded-3xl shadow-xl"><i data-lucide="bot" size="32"></i></div>
-                        <div>
-                            <p class="font-black text-2xl uppercase tracking-tighter">Localization Mentor</p>
-                            <p class="text-xs text-orange-500 font-black tracking-[0.2em] mt-2 uppercase">Deep Grounding: Day 1 Archives</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-4">
-                        <select id="model-select" class="bg-stone-900 text-xs font-black border-2 border-stone-700 rounded-2xl px-5 py-3 outline-none text-white">
-                            <option value="gemini-1.5-flash">Gemini 1.5 Flash (Production)</option>
-                            <option value="gemini-1.5-pro">Gemini 1.5 Pro (Deep Logic)</option>
-                        </select>
-                        <button onclick="deactivateMentor()" class="text-xs bg-stone-900 hover:bg-red-700 px-6 py-3 rounded-2xl border-2 border-stone-700 font-black text-white transition-all uppercase">Reset</button>
-                    </div>
-                </div>
-                
-                <div id="chat-messages" class="flex-grow p-10 overflow-y-auto space-y-8 bg-[#fdfcfb]">
-                    <div class="chat-bubble-ai max-w-[85%] p-8 text-xl leading-relaxed shadow-lg animate-fade font-medium text-stone-800 border border-stone-100">
-                        Explorer, I am ready. We can talk about the <span class="font-black text-orange-700">Mount Everest</span> of subjects, the <span class="font-black text-orange-700">apple seed</span> metaphor for overshoot, or why personal wellbeing now requires <strong>Systems-Health</strong>.
-                    </div>
-                </div>
-
-                <div class="p-8 border-t-2 border-stone-200 bg-white">
-                    <form onsubmit="event.preventDefault(); sendMessage();" class="flex gap-6">
-                        <input type="text" id="chat-input" placeholder="Ask about the 'Mount Everest' analogy..." class="flex-grow p-7 rounded-[2rem] border-4 border-stone-100 text-xl font-bold focus:outline-none focus:border-orange-500 transition-all bg-stone-50 shadow-inner">
-                        <button type="submit" class="bg-stone-950 text-white px-10 rounded-[2rem] hover:bg-black transition-all shadow-2xl active:scale-90">
-                            <i data-lucide="send" size="32"></i>
-                        </button>
-                    </form>
-                    <div id="debug-area" class="hidden mt-8 p-8 bg-red-50 border-[6px] border-red-100 rounded-[2.5rem]">
-                        <p class="text-sm font-black text-red-700 uppercase mb-3">CRITICAL SYSTEM ERROR:</p>
-                        <p id="error-display" class="text-base text-red-600 font-black italic"></p>
-                    </div>
+                    <button onclick="saveDay1()" class="bg-orange-600 hover:bg-orange-500 text-white font-black py-6 px-12 rounded-2xl text-xl transition-all shadow-xl shadow-orange-900/40">Seal Day 1 Commitment</button>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Action Map Tab -->
-        <div id="action-tab" class="hidden tab-content animate-fade">
-            <div class="max-w-4xl mx-auto glass-panel p-16 md:p-24 rounded-[5rem] border-4 border-stone-100 text-center shadow-2xl">
-                <div class="bg-orange-50 w-32 h-32 rounded-full flex items-center justify-center mx-auto mb-10 border-8 border-orange-100 text-orange-600 shadow-inner">
-                    <i data-lucide="shield-alert" size="64"></i>
-                </div>
-                <h3 class="text-6xl font-black serif mb-8 text-stone-900 tracking-tighter">Day 1 Reality Check</h3>
-                <p class="text-stone-500 text-2xl mb-16 leading-relaxed font-bold italic">Identify one system you rely on that is currently in <span class="text-orange-600 uppercase font-black underline decoration-8 decoration-orange-100">Overshoot</span>.</p>
-                <div class="space-y-12 text-left">
-                    <div>
-                        <label class="block text-sm font-black text-stone-950 mb-6 uppercase tracking-[0.3em]">1. Systemic Dependency</label>
-                        <input type="text" placeholder="e.g. Global Industrial Food Supply" class="w-full p-8 rounded-3xl border-4 border-stone-100 italic text-3xl font-black focus:border-orange-500 outline-none shadow-xl bg-stone-50 text-stone-800">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-black text-stone-950 mb-6 uppercase tracking-[0.3em]">2. The "Apple Seed" Reflection</label>
-                        <textarea class="w-full p-8 rounded-3xl border-4 border-stone-100 h-60 text-stone-800 text-2xl font-bold focus:border-orange-500 outline-none shadow-xl bg-stone-50" placeholder="How is this system currently consuming the capital of the future?"></textarea>
-                    </div>
-                    <button class="w-full bg-stone-950 text-white py-10 rounded-[3rem] font-black text-3xl shadow-2xl hover:bg-black active:scale-95 transition-all tracking-tight uppercase border-b-[16px] border-stone-800">Commit to the Truth</button>
-                </div>
-            </div>
-        </div>
     </main>
 
-    <footer class="p-16 text-center text-stone-400 text-xs font-black uppercase tracking-[0.6em] border-t-2 border-stone-100 mt-24">
-        <p>&copy; 2026 THE LOCALIZATION MOVEMENT | GROUNDED IN THE GREAT STORY</p>
+    <!-- Modal: Elephant Inventory -->
+    <div id="elephant-inventory" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-stone-950/90 backdrop-blur-sm"></div>
+        <div class="relative bg-white w-full max-w-2xl rounded-[2.5rem] p-8 md:p-12 shadow-2xl">
+            <button onclick="closeModal('elephant-inventory')" class="absolute top-6 right-6 text-stone-400 hover:text-black"><i data-lucide="x"></i></button>
+            <h3 class="text-3xl font-black serif mb-4">The Systemic Inventory</h3>
+            <p class="text-stone-600 mb-8">Check the systems you rely on that are managed by people you will never meet:</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+                <label class="flex items-center gap-3 p-4 border-2 border-stone-100 rounded-2xl cursor-pointer hover:border-orange-500 transition-colors font-bold">
+                    <input type="checkbox" class="w-6 h-6 rounded border-2 border-stone-300 accent-orange-600">
+                    Energy Grid (Heat/AC)
+                </label>
+                <label class="flex items-center gap-3 p-4 border-2 border-stone-100 rounded-2xl cursor-pointer hover:border-orange-500 transition-colors font-bold">
+                    <input type="checkbox" class="w-6 h-6 rounded border-2 border-stone-300 accent-orange-600">
+                    Water Processing Plant
+                </label>
+                <label class="flex items-center gap-3 p-4 border-2 border-stone-100 rounded-2xl cursor-pointer hover:border-orange-500 transition-colors font-bold">
+                    <input type="checkbox" class="w-6 h-6 rounded border-2 border-stone-300 accent-orange-600">
+                    Imported Supermarket Food
+                </label>
+                <label class="flex items-center gap-3 p-4 border-2 border-stone-100 rounded-2xl cursor-pointer hover:border-orange-500 transition-colors font-bold">
+                    <input type="checkbox" class="w-6 h-6 rounded border-2 border-stone-300 accent-orange-600">
+                    Global Digital Banking
+                </label>
+            </div>
+            <div class="p-6 bg-orange-50 rounded-2xl border-l-8 border-orange-500 italic text-stone-800">
+                "Each checkmark represents a wire in the subconscious web of anxiety. We feel stressed because we have no agency over our own survival."
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Apple Seed Lab -->
+    <div id="apple-seed-lab" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-stone-950/90 backdrop-blur-sm"></div>
+        <div class="relative bg-white w-full max-w-2xl rounded-[2.5rem] p-8 md:p-12 shadow-2xl">
+            <button onclick="closeModal('apple-seed-lab')" class="absolute top-6 right-6 text-stone-400 hover:text-black"><i data-lucide="x"></i></button>
+            <h3 class="text-3xl font-black serif mb-2">The Apple Seed Lab</h3>
+            <p class="text-stone-500 mb-8 uppercase tracking-widest font-black text-xs">Visualizing Ecological Overshoot</p>
+            
+            <div class="flex flex-col items-center gap-10">
+                <div class="flex gap-4 w-full h-48 items-end justify-center">
+                    <div class="flex flex-col items-center gap-2 w-24">
+                        <div class="w-full bg-leaf-600 h-16 rounded-t-lg"></div>
+                        <span class="text-[10px] font-black uppercase text-stone-400">Natural Yield</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2 w-24">
+                        <div id="capital-bar" class="w-full bg-orange-600 h-44 rounded-t-lg"></div>
+                        <span class="text-[10px] font-black uppercase text-stone-400">Natural Capital</span>
+                    </div>
+                </div>
+
+                <div class="text-center space-y-6">
+                    <p id="sim-text" class="text-stone-700 font-medium text-lg leading-relaxed">We are currently using the yield (interest) AND the capital. Watch what happens to the stock.</p>
+                    <button onclick="runSimulation()" id="sim-btn" class="bg-red-600 text-white font-black px-12 py-4 rounded-2xl hover:bg-red-700 transition-all shadow-xl shadow-red-200">START "SLURPING"</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="p-12 text-center text-stone-400 text-[10px] font-black uppercase tracking-[0.4em] border-stone-200 mt-auto">
+        <p>&copy; 2026 THE LOCALIZATION MOVEMENT | AGENTIC TEACHING SERIES</p>
     </footer>
 
     <script>
-        let apiKey = ""; 
+        function switchTab(tab) {
+            // Placeholder for 5-day scaling
+            console.log("Switching to Day: " + tab);
+        }
 
-        const topics = {
-            elephant: { title: "The Elephant in the Town Square", content: `<div class='space-y-8'><p class='text-stone-700 text-2xl leading-relaxed'>The <strong>"Elephant in the room"</strong> used to be our private secrets. But today, the Elephant has grown too large for the living room. It is now in the <strong>Global Town Square</strong>. We call it the Metacrisis.</p><div class='p-12 bg-orange-50 rounded-[3rem] border-l-[24px] border-orange-500 italic text-stone-900 text-3xl serif leading-snug shadow-2xl'>"The Elephant is the Metacrisis. We are in a toxic relationship with the biosphere, and we are too afraid to file for divorce."</div><h5 class='font-black text-base text-orange-700 uppercase tracking-[0.3em] mt-12'>The Systems-Health Pivot:</h5><p class='text-stone-600 leading-relaxed text-xl font-bold'>We must stop treating anxiety as a private flaw. It is a biological alarm signaling that the systems we rely on are stretching past their limits. You cannot be a healthy person on a sick planet.</p></div>` },
-            everest: { title: "The 'Mount Everest' of Subjects", content: `<div class='space-y-10 text-stone-700'><p class='text-2xl leading-relaxed'>The <strong>Metacrisis</strong> is the "Mount Everest" of subjects because it is the most daunting reality humanity has ever faced. It isn't just one crisis; it is the entire range.</p><div class='grid grid-cols-1 md:grid-cols-2 gap-10 mt-8'><div class='p-10 bg-orange-50 rounded-[2.5rem] border-4 border-orange-100 shadow-xl'><p class='text-xs font-black text-orange-700 uppercase mb-6 tracking-widest'>Visible Symptoms</p><ul class='text-xl space-y-4 text-stone-700 font-black'><li class='flex items-center gap-4'><span class='w-3 h-3 bg-orange-500 rounded-full'></span> Climate Instability</li><li class='flex items-center gap-4'><span class='w-3 h-3 bg-orange-500 rounded-full'></span> Social Fragmentation</li><li class='flex items-center gap-4'><span class='w-3 h-3 bg-orange-500 rounded-full'></span> Economic Unraveling</li></ul></div><div class='p-10 bg-stone-900 text-white rounded-[2.5rem] shadow-2xl'><p class='text-xs font-black text-orange-400 uppercase mb-6 tracking-widest'>The Hidden Base</p><p class='text-xl italic leading-relaxed text-stone-300 font-bold'>The "Meaning Crisis" and our collective refusal to acknowledge biophysical limits.</p></div></div></div>` },
-            overshoot: { title: "Ecological Overshoot: The Apple Seed", content: `<div class='space-y-10 text-stone-700'><div class='flex items-start gap-8 p-10 bg-red-50 rounded-[3rem] border-l-[16px] border-orange-600 shadow-2xl'><i data-lucide='apple' class='text-orange-600 shrink-0' size="64"></i><div><h5 class='font-black text-3xl text-stone-900 mb-4 uppercase tracking-tighter'>Eating the Seed vs. Planting It</h5><p class='text-stone-700 leading-relaxed italic text-2xl font-bold'>Overshoot means we are using nature faster than it can regenerate. We are spending from an overdrawn bank account.</p></div></div><p class='text-stone-600 leading-relaxed text-2xl font-black uppercase tracking-tight'>In our 2026 Shift framework, we define this as <strong>"liquidating the capital"</strong> that our grandchildren will need to survive.</p></div>` },
-            growth: { title: "The Myth of Infinite Growth", content: `<div class='space-y-10 text-stone-700'><p class='text-2xl leading-relaxed'>Mainstream economics is built on the myth of <strong>Infinite physical growth on a finite planet</strong>. This is a mathematical impossibility and a biological disorder.</p><div class='p-16 border-[12px] border-dotted border-stone-200 rounded-[5rem] text-center relative shadow-inner bg-white'><p class='serif italic text-4xl leading-snug text-stone-950 mb-10 font-black'>\"Physical growth is a phase. Once a civilization reaches maturity, it must grow deeper (complexity and wisdom) rather than larger (consumption).\"</p><p class='text-base font-black text-orange-600 uppercase tracking-[0.5em]'>The Transition: Caterpillar to Butterfly</p></div></div>` }
-        };
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+            document.getElementById(id).classList.add('flex');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
 
-        const vocabulary = ["Metacrisis", "Overshoot", "Systems-Health", "Apple Seed", "Mount Everest", "The Slurping Sound", "Infinite Growth", "Natural Capital", "Caterpillar to Butterfly"];
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            document.getElementById(id).classList.remove('flex');
+        }
 
-        async function testAndActivate() {
-            const val = document.getElementById('api-key-input').value.trim();
-            const feedback = document.getElementById('test-feedback');
-            const btn = document.getElementById('activate-btn');
+        function runSimulation() {
+            const bar = document.getElementById('capital-bar');
+            const btn = document.getElementById('sim-btn');
+            const text = document.getElementById('sim-text');
             
-            if (!val) {
-                feedback.innerText = "ERROR: FIELD IS EMPTY.";
-                feedback.classList.remove('hidden');
+            bar.classList.add('slurping');
+            btn.innerText = "SLURPING...";
+            btn.disabled = true;
+            btn.classList.add('opacity-50');
+
+            setTimeout(() => {
+                text.innerHTML = "<span class='text-red-600 font-black uppercase'>Overshoot Complete.</span><br>The flow felt infinite right up until the stock ran out.";
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            }, 5000);
+        }
+
+        function saveDay1() {
+            const sys = document.getElementById('user-system').value;
+            const over = document.getElementById('user-overshoot').value;
+            
+            if (!sys || !over) {
+                alert("Please complete your reality check before sealing the commitment.");
                 return;
             }
 
-            btn.innerHTML = `<i data-lucide="loader" class="animate-spin mr-4"></i> SYNCING...`;
+            localStorage.setItem('day1_system', sys);
+            localStorage.setItem('day1_overshoot', over);
             
-            try {
-                apiKey = val;
-                // Test minimal call
-                await callGemini("Connection check. Respond exactly with 'SYNC_OK'."); 
-                document.getElementById('activation-overlay').classList.add('opacity-0');
-                setTimeout(() => {
-                    document.getElementById('activation-overlay').classList.add('hidden');
-                }, 500);
-            } catch (error) {
-                apiKey = "";
-                feedback.innerText = `SYNC FAILED: ${error.message}`;
-                feedback.classList.remove('hidden');
-                btn.innerHTML = `<span>ACTIVATE NOW</span>`;
-                lucide.createIcons();
-            }
-        }
-
-        function deactivateMentor() {
-            apiKey = "";
-            const overlay = document.getElementById('activation-overlay');
-            overlay.classList.remove('hidden');
-            setTimeout(() => overlay.classList.remove('opacity-0'), 10);
-            document.getElementById('test-feedback').classList.add('hidden');
-            document.getElementById('api-key-input').value = "";
-        }
-
-        function switchTab(tab) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-            document.getElementById(`${tab}-tab`).classList.remove('hidden');
-            if (typeof lucide !== 'undefined') lucide.createIcons();
-            window.scrollTo(0,0);
-        }
-
-        function showTopic(id) {
-            const display = document.getElementById('topic-display');
-            const topic = topics[id];
-            display.innerHTML = `<div class="animate-fade"><h3 class="text-6xl font-black serif mb-12 text-stone-950 border-b-[12px] pb-10 border-orange-50 tracking-tighter">${topic.title}</h3>${topic.content}</div>`;
+            const btn = event.target;
+            btn.innerHTML = "<i data-lucide='check' class='inline mr-2'></i> DAY 1 SEALED";
+            btn.classList.remove('bg-orange-600');
+            btn.classList.add('bg-leaf-600');
             lucide.createIcons();
-        }
-
-        function renderVocab() {
-            const cloud = document.getElementById('vocab-cloud');
-            if (!cloud) return;
-            cloud.innerHTML = '';
-            vocabulary.forEach(v => {
-                const span = document.createElement('span');
-                span.className = "px-5 py-3 bg-white border-4 border-stone-100 rounded-3xl text-stone-800 hover:border-orange-500 hover:text-orange-600 font-black text-xs cursor-pointer transition-all m-2 inline-block shadow-lg uppercase tracking-widest";
-                span.innerText = v;
-                span.onclick = () => { 
-                    document.getElementById('chat-input').value = `Explain ${v} using Day 1 metaphors.`; 
-                    switchTab('assistant'); 
-                    if(apiKey) sendMessage();
-                };
-                cloud.appendChild(span);
-            });
-        }
-
-        async function sendMessage() {
-            const input = document.getElementById('chat-input');
-            const userText = input.value.trim();
-            const debugArea = document.getElementById('debug-area');
-            const errorDisplay = document.getElementById('error-display');
             
-            if (!userText || !apiKey) return;
-
-            debugArea.classList.add('hidden');
-            const chatBox = document.getElementById('chat-messages');
-            
-            const userDiv = document.createElement('div');
-            userDiv.className = "flex justify-end animate-fade";
-            userDiv.innerHTML = `<div class="chat-bubble-user max-w-[85%] p-7 text-2xl font-black shadow-2xl">${userText}</div>`;
-            chatBox.appendChild(userDiv);
-            input.value = "";
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            const aiLoadingDiv = document.createElement('div');
-            aiLoadingDiv.className = "flex justify-start animate-fade";
-            aiLoadingDiv.innerHTML = `<div class="chat-bubble-ai max-w-[85%] p-7 text-sm italic text-stone-400 font-black border-l-[12px] border-stone-200 tracking-[0.2em] uppercase">CONSULTING DAY 1 ARCHIVES...</div>`;
-            chatBox.appendChild(aiLoadingDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            try {
-                const response = await callGemini(userText);
-                aiLoadingDiv.innerHTML = `<div class="chat-bubble-ai max-w-[85%] p-8 text-2xl md:text-3xl leading-snug text-stone-950 font-bold">${response}</div>`;
-            } catch (error) {
-                aiLoadingDiv.innerHTML = `<div class="chat-bubble-ai max-w-[85%] p-8 text-2xl text-red-600 font-black border-8 border-red-100">SYSTEM DISCONNECTION</div>`;
-                errorDisplay.innerText = error.message;
-                debugArea.classList.remove('hidden');
-            }
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        async function callGemini(query, retries = 0) {
-            const sys = `You are "The Localization Assistant," an AI mentor grounded in Day 1 of the Foundations of the Localization Movement.
-            CORE SUBJECT: The Metacrisis and the Global Shadow. 
-            KEY METAPHORS: "Mount Everest" (scale of the predicament), "Apple Seed" (overshoot/liquidation of natural capital), "The Elephant in the Town Square."
-            PHILOSOPHY: Contrast "Self-Help" (Me) with "Systems-Health" (We). Explain that "Infinite Growth" on a finite planet is a lie.
-            TONE: Conversational, wise, Midwestern-grounded. Bridge personal anxiety back to systemic failure.`;
-            
-            const model = document.getElementById('model-select').value;
-            // Production V1 endpoint
-            const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`;
-            
-            // CONSOLIDATED PAYLOAD: Injects the system prompt as context at the start of the user query
-            // for 100% compatibility with older V1 keys and rollouts.
-            const promptContext = `[SYSTEM INSTRUCTIONS: ${sys}]\n\nUser Question: ${query}`;
-            
-            const payload = {
-                contents: [{ 
-                    parts: [{ text: promptContext }] 
-                }]
-            };
-
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                const data = await response.json();
-                if (!response.ok) {
-                    throw new Error(data.error?.message || `HTTP ${response.status}: Request Error.`);
-                }
-                
-                return data.candidates?.[0]?.content?.parts?.[0]?.text || "NO RESPONSE RECEIVED.";
-            } catch (err) {
-                if (retries < 3 && (err.message.includes("503") || err.message.includes("network"))) {
-                    await new Promise(res => setTimeout(res, Math.pow(2, retries) * 1000));
-                    return callGemini(query, retries + 1);
-                }
-                throw err;
-            }
+            setTimeout(() => {
+                alert("Day 1 data saved to your local device. Tomorrow, we map your home watershed.");
+            }, 500);
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const checkLucide = setInterval(() => { if (typeof lucide !== 'undefined') { lucide.createIcons(); renderVocab(); clearInterval(checkLucide); } }, 100);
-            setTimeout(() => clearInterval(checkLucide), 5000);
+            const checkLucide = setInterval(() => { if (typeof lucide !== 'undefined') { lucide.createIcons(); clearInterval(checkLucide); } }, 100);
         });
     </script>
 </body>
