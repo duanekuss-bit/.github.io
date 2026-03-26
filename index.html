@@ -3,259 +3,449 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Localization Assistant | Day 1 Quest</title>
+    <title>The Localization Assistant: Systemic Inventory</title>
+    
+    <!-- Chosen Palette: Warm Earth Neutrals (Stone Backgrounds, Sage Greens for Localization, Deep Terracotta for Shadow/Metacrisis, Muted Slate for Text) -->
+    
+    <!-- Application Structure Plan: 
+    The SPA is structured as a guided, interactive "Systemic Inventory" (Day 1 of the course). 
+    1. Hero/Intro: Reframes the "Elephant in the Room" as the Metacrisis. Sets the tone.
+    2. Socratic Audit Module: Allows users to input their morning routine to reveal "Energy Blindness". Uses interactive buttons to simulate the conversational flow of an agent.
+    3. The Matrix vs. The Web (Data Dashboard): Visualizes the user's hidden dependencies across 4 buckets (Energy, Water, Food, Digital) using Chart.js.
+    4. 72-Hour Challenge: An interactive toggle that severely reduces the chart data, simulating a supply chain pause to vividly illustrate "Ecological Overshoot".
+    5. Emotional Alchemy & Action: Guides the user from Solastalgia to a concrete "Grain of Sand" localizing action. 
+    This linear-yet-exploratory structure moves the user from personal habit (Me) to systemic awareness (We), directly fulfilling the pedagogical goals of the source report. -->
+    
+    <!-- Visualization & Content Choices: 
+    1. Morning Audit Grid -> Goal: Inform/Organize -> Viz: Interactive HTML Button Grid -> Interaction: Click to reveal hidden systems -> Justifies "Socratic Audit" replacing lectures.
+    2. Dependency Footprint -> Goal: Compare/Relationships -> Viz: Chart.js Doughnut Chart (Canvas) -> Interaction: Dynamically updates based on audit choices -> Shows the weight of the "Invisible Support Team" across 4 buckets.
+    3. 72-Hour Supply Pause -> Goal: Change/Impact -> Viz: HTML/CSS Toggle switching Chart.js data -> Interaction: Switch toggle -> Visually demonstrates fragility (Overshoot) instantly.
+    * NO SVG or Mermaid JS used. All visual structure relies on Tailwind CSS, Unicode icons, and Canvas (Chart.js). -->
+    
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Lora:ital,wght@0,400;0,700;1,400;1,700&display=swap');
-        
+        /* Base Theme Colors configured for Tailwind */
         :root {
-            --stone-950: #0c0a09;
-            --orange-600: #ea580c;
-            --leaf-600: #166534;
+            --bg-stone: #F7F5F0;
+            --text-slate: #2D3748;
+            --accent-sage: #6B8E6B;
+            --accent-terra: #B95C3F;
+            --muted-sand: #E5E0D8;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #fdfaf7;
-            color: #1c1917;
+            background-color: var(--bg-stone);
+            color: var(--text-slate);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
 
-        .serif { font-family: 'Lora', serif; }
-
-        .quest-card {
-            background: white;
-            border: 2px solid #e7e5e4;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        /* Mandatory Chart Container Constraints */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 40vh;
+            min-height: 300px;
+            max-height: 400px;
         }
 
-        .quest-card:hover {
-            border-color: var(--orange-600);
-            transform: translateY(-4px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        .audit-btn {
+            transition: all 0.2s ease-in-out;
         }
-
-        .progress-step-active {
-            background-color: var(--orange-600);
+        .audit-btn.selected {
+            background-color: var(--accent-sage);
             color: white;
-            box-shadow: 0 0 15px rgba(234, 88, 12, 0.4);
+            border-color: var(--accent-sage);
+            transform: scale(0.98);
         }
 
-        /* Apple Seed Animation */
-        @keyframes slurp {
-            0% { transform: scaleY(1); }
-            100% { transform: scaleY(0.1); transform-origin: bottom; }
+        /* Custom Toggle Switch CSS */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: var(--accent-terra);
         }
-        .slurping { animation: slurp 5s linear forwards; }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: var(--accent-terra);
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="antialiased pb-20">
 
-    <!-- Header -->
-    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b-2 border-stone-200 px-6 py-4">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="bg-stone-900 p-2 rounded-lg text-white">
-                    <i data-lucide="mountain"></i>
-                </div>
-                <h1 class="text-xl font-black tracking-tighter uppercase">Localization Quest</h1>
+    <!-- Header Navigation -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="text-xl font-bold text-gray-800">
+                <span class="text-[#B95C3F]">&#x1F418;</span> The Localization Assistant
             </div>
-            <div class="flex items-center gap-4">
-                <div class="hidden md:flex gap-1">
-                    <div class="h-2 w-8 rounded-full progress-step-active"></div>
-                    <div class="h-2 w-8 rounded-full bg-stone-200"></div>
-                    <div class="h-2 w-8 rounded-full bg-stone-200"></div>
-                    <div class="h-2 w-8 rounded-full bg-stone-200"></div>
-                    <div class="h-2 w-8 rounded-full bg-stone-200"></div>
-                </div>
-                <span class="text-[10px] font-black uppercase text-orange-600 tracking-widest">Day 1 of 5</span>
+            <div class="text-sm font-medium text-gray-500 uppercase tracking-wide">
+                Day 1: The Metacrisis
             </div>
         </div>
-    </nav>
+    </header>
 
-    <main class="flex-grow max-w-5xl mx-auto w-full p-6 md:p-12">
-        
-        <!-- Day 1 Context -->
-        <header class="mb-12">
-            <h2 class="text-4xl md:text-6xl font-black serif mb-6 leading-tight">The Global Shadow</h2>
-            <p class="text-xl text-stone-600 max-w-3xl leading-relaxed">
-                Before we can build a new world, we must stop lying about the current one. Today is about <strong>Truth-Telling</strong>.
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 space-y-16">
+
+        <!-- Phase 1: Meeting the New Elephant -->
+        <section class="text-center max-w-3xl mx-auto space-y-6">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight">Meet the New Elephant</h1>
+            <p class="text-lg md:text-xl text-gray-600 leading-relaxed">
+                In the old days, we worked on fixing our personal secrets. Today, the Elephant has grown—it fills the whole house. It’s the <strong>Metacrisis</strong>: the convergence of ecological, social, and economic breakdown. 
             </p>
-        </header>
+            <p class="text-md text-gray-600">
+                Before we can act, we must see what's keeping you standing. True health is impossible in a sick system. It's time to shift from <em>"Me"</em> (personal optimization) to <em>"We"</em> (community resilience). Are you ready to audit your <strong>Invisible Support Team</strong>?
+            </p>
+        </section>
 
-        <!-- Module Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            
-            <!-- Quest 1: The Elephant Inventory -->
-            <div class="quest-card rounded-[2rem] p-8 flex flex-col">
-                <div class="bg-orange-100 text-orange-700 w-12 h-12 rounded-2xl flex items-center justify-center mb-6">
-                    <i data-lucide="eye"></i>
-                </div>
-                <h3 class="text-2xl font-black uppercase tracking-tight mb-2">The Town Square Elephant</h3>
-                <p class="text-stone-600 mb-6 font-medium">In the past, the Elephant was your private secrets. Today, it is our collective dependency on failing systems.</p>
-                <button onclick="openModal('elephant-inventory')" class="mt-auto bg-stone-900 text-white font-black py-4 rounded-xl hover:bg-black transition-all uppercase tracking-widest text-xs">Start Inventory</button>
+        <!-- Phase 2: The Socratic Audit -->
+        <section class="bg-white rounded-2xl shadow-md p-6 md:p-10 border border-gray-100">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-3">1. The Routine Audit</h2>
+                <p class="text-gray-600">
+                    <strong>Context:</strong> Most of modern human life operates in a state of "Energy Blindness". We touch things without seeing the vast, fragile systems supporting them. <br><br>
+                    <strong>Action:</strong> Select the first 3 things you interacted with after waking up today. Watch as your system dependencies are mapped in real-time.
+                </p>
             </div>
 
-            <!-- Quest 2: Apple Seed Simulator -->
-            <div class="quest-card rounded-[2rem] p-8 flex flex-col">
-                <div class="bg-red-100 text-red-700 w-12 h-12 rounded-2xl flex items-center justify-center mb-6">
-                    <i data-lucide="apple"></i>
-                </div>
-                <h3 class="text-2xl font-black uppercase tracking-tight mb-2">The Apple Seed Lab</h3>
-                <p class="text-stone-600 mb-6 font-medium">Visualizing <strong>Ecological Overshoot</strong>. Are we living off the interest, or liquidating the capital?</p>
-                <button onclick="openModal('apple-seed-lab')" class="mt-auto bg-stone-900 text-white font-black py-4 rounded-xl hover:bg-black transition-all uppercase tracking-widest text-xs">Launch Simulator</button>
-            </div>
-
-        </div>
-
-        <!-- The Day 1 Integration Form -->
-        <section class="bg-stone-900 text-white rounded-[3rem] p-8 md:p-16 shadow-2xl relative overflow-hidden">
-            <div class="absolute top-0 right-0 p-12 opacity-10">
-                <i data-lucide="shield-alert" size="200"></i>
-            </div>
-            <div class="relative z-10">
-                <h3 class="text-3xl md:text-5xl font-black serif mb-6">Day 1 Reality Check</h3>
-                <p class="text-stone-400 text-lg mb-10 max-w-2xl">Capture your Day 1 insights here. This will form the foundation of your <strong>Bioregional Action Map</strong>.</p>
-                
-                <div class="space-y-8 max-w-2xl">
-                    <div class="space-y-3">
-                        <label class="block text-xs font-black text-orange-500 uppercase tracking-[0.3em]">The System I Rely On</label>
-                        <input type="text" id="user-system" placeholder="e.g. The Global Food Chain" class="w-full bg-stone-800 border-2 border-stone-700 p-5 rounded-2xl text-xl font-bold focus:border-orange-500 outline-none">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <!-- Audit Inputs -->
+                <div>
+                    <h3 class="text-sm font-semibold uppercase text-gray-500 mb-4 tracking-wider">Morning Activities</h3>
+                    <div class="grid grid-cols-2 gap-3" id="activity-grid">
+                        <!-- Buttons injected via JS -->
                     </div>
-                    <div class="space-y-3">
-                        <label class="block text-xs font-black text-orange-500 uppercase tracking-[0.3em]">The "Slurping Sound"</label>
-                        <p class="text-sm text-stone-400 italic">How is this system currently "eating the seed" (consuming capital)?</p>
-                        <textarea id="user-overshoot" class="w-full bg-stone-800 border-2 border-stone-700 p-5 rounded-2xl h-40 text-lg outline-none focus:border-orange-500"></textarea>
+                    <div class="mt-4 text-sm text-gray-500" id="selection-counter">
+                        Select 3 items (0/3 selected)
                     </div>
-                    <button onclick="saveDay1()" class="bg-orange-600 hover:bg-orange-500 text-white font-black py-6 px-12 rounded-2xl text-xl transition-all shadow-xl shadow-orange-900/40">Seal Day 1 Commitment</button>
+                </div>
+
+                <!-- Socratic Reveal Panel -->
+                <div class="bg-[#F7F5F0] rounded-xl p-6 border border-[#E5E0D8] h-full flex flex-col">
+                    <h3 class="text-sm font-semibold uppercase text-gray-500 mb-4 tracking-wider">Your Systemic Shadow</h3>
+                    <div id="shadow-reveal" class="flex-grow flex flex-col justify-center text-gray-600 italic text-center">
+                        Your invisible support team will appear here once you select your morning routine...
+                    </div>
                 </div>
             </div>
         </section>
 
+        <!-- Phase 3: The Matrix vs The Web (Data Dashboard) -->
+        <section class="bg-white rounded-2xl shadow-md p-6 md:p-10 border border-gray-100" id="dashboard-section">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-3">2. The "Matrix" vs. The "Web"</h2>
+                <p class="text-gray-600">
+                    <strong>Context:</strong> Based on your audit, your lifestyle relies on four fragile global buckets. This is the "Cosmic Credit Card" — ecological overshoot where we consume faster than nature regenerates.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <!-- Chart Container (Strictly Constrained) -->
+                <div class="w-full">
+                    <div class="chart-container">
+                        <canvas id="dependencyChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- The 72 Hour Challenge Toggle -->
+                <div class="space-y-6 bg-red-50 p-6 rounded-xl border border-red-100">
+                    <h3 class="text-xl font-bold text-[#B95C3F]">The 72-Hour Challenge</h3>
+                    <p class="text-gray-700 text-sm">
+                        What if the global supply chains you just mapped paused for 72 hours? 
+                    </p>
+                    
+                    <!-- Toggle Switch -->
+                    <div class="flex items-center justify-between w-full">
+                        <label for="pause-toggle" class="flex items-center cursor-pointer">
+                            <div class="relative">
+                                <input type="checkbox" id="pause-toggle" class="sr-only toggle-checkbox">
+                                <div class="block bg-gray-300 w-14 h-8 rounded-full toggle-label transition-colors"></div>
+                                <div class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition-transform"></div>
+                            </div>
+                            <div class="ml-3 text-gray-700 font-medium">
+                                Simulate Global Pause
+                            </div>
+                        </label>
+                    </div>
+
+                    <div id="pause-impact-text" class="text-sm font-semibold text-red-800 hidden mt-4 p-4 bg-red-100 rounded-lg">
+                        Notice the collapse. Your "Energy" drops as fuel stocks halt. "Food" plummets as global shipping stops. What remains is your true local resilience.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Phase 4 & 5: Emotional Alchemy & The Grain of Sand -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <!-- Solastalgia Reframing -->
+            <div class="bg-gray-800 text-white rounded-2xl p-8 shadow-lg">
+                <div class="text-3xl mb-4">&#x1F30D;</div>
+                <h2 class="text-2xl font-bold mb-3">Reframing the Shadow</h2>
+                <p class="text-gray-300 text-sm mb-4">
+                    <strong>Context:</strong> As you realize your total dependency, you may feel <em>Solastalgia</em>—a form of distress caused by environmental change and fragility in your home.
+                </p>
+                <p class="text-gray-100 font-medium italic border-l-4 border-gray-500 pl-4 py-2">
+                    "That heavy feeling isn't a sign of weakness; it's a systems signal. It means you're waking up to the 'WE'. It’s an invitation to shift from the 'Matrix' of global convenience to the 'Web' of local resilience."
+                </p>
+            </div>
+
+            <!-- Grain of Sand Action -->
+            <div class="bg-[#6B8E6B] text-white rounded-2xl p-8 shadow-lg flex flex-col justify-between">
+                <div>
+                    <div class="text-3xl mb-4">&#x1F331;</div>
+                    <h2 class="text-2xl font-bold mb-3">The "Grain of Sand" Task</h2>
+                    <p class="text-green-100 text-sm mb-4">
+                        <strong>Action:</strong> Look at your map. Which thread looks most fragile? Choose one hidden system you rely on to begin 'localizing' this week. Rebuilding systemic trust starts where you stand.
+                    </p>
+                    
+                    <select id="action-selector" class="w-full mt-2 p-3 rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400">
+                        <option value="" disabled selected>Select a fragile system to localize...</option>
+                        <option value="energy">Energy (Heating, Electricity)</option>
+                        <option value="water">Water (Watersheds, Usage)</option>
+                        <option value="food">Food (Supply chains, Groceries)</option>
+                        <option value="digital">Digital (Screen time, Devices)</option>
+                    </select>
+                </div>
+
+                <div id="action-result" class="mt-6 text-sm font-bold bg-white/20 p-4 rounded-lg hidden">
+                    <!-- Action result injected here -->
+                </div>
+            </div>
+
+        </section>
+
     </main>
 
-    <!-- Modal: Elephant Inventory -->
-    <div id="elephant-inventory" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-stone-950/90 backdrop-blur-sm"></div>
-        <div class="relative bg-white w-full max-w-2xl rounded-[2.5rem] p-8 md:p-12 shadow-2xl">
-            <button onclick="closeModal('elephant-inventory')" class="absolute top-6 right-6 text-stone-400 hover:text-black"><i data-lucide="x"></i></button>
-            <h3 class="text-3xl font-black serif mb-4">The Systemic Inventory</h3>
-            <p class="text-stone-600 mb-8">Check the systems you rely on that are managed by people you will never meet:</p>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
-                <label class="flex items-center gap-3 p-4 border-2 border-stone-100 rounded-2xl cursor-pointer hover:border-orange-500 transition-colors font-bold">
-                    <input type="checkbox" class="w-6 h-6 rounded border-2 border-stone-300 accent-orange-600">
-                    Energy Grid (Heat/AC)
-                </label>
-                <label class="flex items-center gap-3 p-4 border-2 border-stone-100 rounded-2xl cursor-pointer hover:border-orange-500 transition-colors font-bold">
-                    <input type="checkbox" class="w-6 h-6 rounded border-2 border-stone-300 accent-orange-600">
-                    Water Processing Plant
-                </label>
-                <label class="flex items-center gap-3 p-4 border-2 border-stone-100 rounded-2xl cursor-pointer hover:border-orange-500 transition-colors font-bold">
-                    <input type="checkbox" class="w-6 h-6 rounded border-2 border-stone-300 accent-orange-600">
-                    Imported Supermarket Food
-                </label>
-                <label class="flex items-center gap-3 p-4 border-2 border-stone-100 rounded-2xl cursor-pointer hover:border-orange-500 transition-colors font-bold">
-                    <input type="checkbox" class="w-6 h-6 rounded border-2 border-stone-300 accent-orange-600">
-                    Global Digital Banking
-                </label>
-            </div>
-            <div class="p-6 bg-orange-50 rounded-2xl border-l-8 border-orange-500 italic text-stone-800">
-                "Each checkmark represents a wire in the subconscious web of anxiety. We feel stressed because we have no agency over our own survival."
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal: Apple Seed Lab -->
-    <div id="apple-seed-lab" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-stone-950/90 backdrop-blur-sm"></div>
-        <div class="relative bg-white w-full max-w-2xl rounded-[2.5rem] p-8 md:p-12 shadow-2xl">
-            <button onclick="closeModal('apple-seed-lab')" class="absolute top-6 right-6 text-stone-400 hover:text-black"><i data-lucide="x"></i></button>
-            <h3 class="text-3xl font-black serif mb-2">The Apple Seed Lab</h3>
-            <p class="text-stone-500 mb-8 uppercase tracking-widest font-black text-xs">Visualizing Ecological Overshoot</p>
-            
-            <div class="flex flex-col items-center gap-10">
-                <div class="flex gap-4 w-full h-48 items-end justify-center">
-                    <div class="flex flex-col items-center gap-2 w-24">
-                        <div class="w-full bg-leaf-600 h-16 rounded-t-lg"></div>
-                        <span class="text-[10px] font-black uppercase text-stone-400">Natural Yield</span>
-                    </div>
-                    <div class="flex flex-col items-center gap-2 w-24">
-                        <div id="capital-bar" class="w-full bg-orange-600 h-44 rounded-t-lg"></div>
-                        <span class="text-[10px] font-black uppercase text-stone-400">Natural Capital</span>
-                    </div>
-                </div>
-
-                <div class="text-center space-y-6">
-                    <p id="sim-text" class="text-stone-700 font-medium text-lg leading-relaxed">We are currently using the yield (interest) AND the capital. Watch what happens to the stock.</p>
-                    <button onclick="runSimulation()" id="sim-btn" class="bg-red-600 text-white font-black px-12 py-4 rounded-2xl hover:bg-red-700 transition-all shadow-xl shadow-red-200">START "SLURPING"</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <footer class="p-12 text-center text-stone-400 text-[10px] font-black uppercase tracking-[0.4em] border-stone-200 mt-auto">
-        <p>&copy; 2026 THE LOCALIZATION MOVEMENT | AGENTIC TEACHING SERIES</p>
-    </footer>
-
+    <!-- JavaScript Logic -->
     <script>
-        function switchTab(tab) {
-            // Placeholder for 5-day scaling
-            console.log("Switching to Day: " + tab);
+        // Data Storage & Content Definitions
+        const activities = [
+            { id: 'coffee', name: '&#x2615; Make Coffee', energy: 20, water: 30, food: 40, digital: 0, 
+              shadow: "Coffee: A global traveler. You rely on 1) Tropical soil, 2) Global shipping lanes, 3) High-pressure energy grids." },
+            { id: 'phone', name: '&#x1F4F1; Check Phone', energy: 10, water: 10, food: 0, digital: 50, 
+              shadow: "Phone: The Digital Shadow. Built on rare mineral extraction (Congo/Chile) and powered by the 'Attention Economy' server farms." },
+            { id: 'heat', name: '&#x1F321; Turn on Heat/AC', energy: 50, water: 0, food: 0, digital: 10, 
+              shadow: "Heating: The 'Slurping Sound' of fossil fuels. You are drawing down ancient geological stocks to manipulate air temperature." },
+            { id: 'shower', name: '&#x1F6BF; Hot Shower', energy: 30, water: 50, food: 0, digital: 0, 
+              shadow: "Shower: Energy blindness meets water literacy. Dependent on distant watersheds, chemical treatment plants, and energy to heat it." },
+            { id: 'drive', name: '&#x1F697; Start Car', energy: 50, water: 0, food: 0, digital: 10, 
+              shadow: "Car: Pure Ecological Overshoot. Global oil supply chains, massive infrastructure, and foreign manufacturing." },
+            { id: 'breakfast', name: '&#x1F373; Eat Breakfast', energy: 10, water: 20, food: 40, digital: 0, 
+              shadow: "Food: The Matrix of global logistics. Average modern meals travel 1,500 miles before hitting your plate." }
+        ];
+
+        const localizationActions = {
+            energy: "Your Grain of Sand: Do a home 'Phantom Power' audit today. Unplug 3 unused electronics, or locate your nearest community solar initiative.",
+            water: "Your Grain of Sand: Find out exactly which watershed your tap water comes from today. Map its source.",
+            food: "Your Grain of Sand: Commit to buying one staple item locally (within 100 miles) this week instead of from the global supermarket chain.",
+            digital: "Your Grain of Sand: Implement a 12-hour digital Sabbath this weekend. Turn off the 'Attention Economy' and walk your local bioregion."
+        };
+
+        // State Management
+        let state = {
+            selectedIds: [],
+            isPaused: false,
+            baseScores: { energy: 10, water: 10, food: 10, digital: 10 } // Baseline survival
+        };
+
+        let dependencyChartInstance = null;
+
+        // Core Interaction Handling: Initialize DOM
+        document.addEventListener('DOMContentLoaded', () => {
+            renderActivityGrid();
+            initChart();
+            setupEventListeners();
+        });
+
+        // Render Socratic Audit Buttons
+        function renderActivityGrid() {
+            const grid = document.getElementById('activity-grid');
+            activities.forEach(act => {
+                const btn = document.createElement('button');
+                btn.className = 'audit-btn w-full text-left px-4 py-3 rounded-xl border-2 border-gray-200 text-gray-700 font-medium hover:border-[#6B8E6B] focus:outline-none';
+                btn.innerHTML = act.name;
+                btn.onclick = () => toggleActivity(act.id, btn);
+                grid.appendChild(btn);
+            });
         }
 
-        function openModal(id) {
-            document.getElementById(id).classList.remove('hidden');
-            document.getElementById(id).classList.add('flex');
-            if (typeof lucide !== 'undefined') lucide.createIcons();
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).classList.add('hidden');
-            document.getElementById(id).classList.remove('flex');
-        }
-
-        function runSimulation() {
-            const bar = document.getElementById('capital-bar');
-            const btn = document.getElementById('sim-btn');
-            const text = document.getElementById('sim-text');
+        // Handle Activity Selection
+        function toggleActivity(id, btnElement) {
+            const index = state.selectedIds.indexOf(id);
             
-            bar.classList.add('slurping');
-            btn.innerText = "SLURPING...";
-            btn.disabled = true;
-            btn.classList.add('opacity-50');
-
-            setTimeout(() => {
-                text.innerHTML = "<span class='text-red-600 font-black uppercase'>Overshoot Complete.</span><br>The flow felt infinite right up until the stock ran out.";
-                if (typeof lucide !== 'undefined') lucide.createIcons();
-            }, 5000);
-        }
-
-        function saveDay1() {
-            const sys = document.getElementById('user-system').value;
-            const over = document.getElementById('user-overshoot').value;
-            
-            if (!sys || !over) {
-                alert("Please complete your reality check before sealing the commitment.");
-                return;
+            if (index > -1) {
+                // Deselect
+                state.selectedIds.splice(index, 1);
+                btnElement.classList.remove('selected');
+            } else {
+                // Select (Max 3)
+                if (state.selectedIds.length >= 3) return; 
+                state.selectedIds.push(id);
+                btnElement.classList.add('selected');
             }
 
-            localStorage.setItem('day1_system', sys);
-            localStorage.setItem('day1_overshoot', over);
-            
-            const btn = event.target;
-            btn.innerHTML = "<i data-lucide='check' class='inline mr-2'></i> DAY 1 SEALED";
-            btn.classList.remove('bg-orange-600');
-            btn.classList.add('bg-leaf-600');
-            lucide.createIcons();
-            
-            setTimeout(() => {
-                alert("Day 1 data saved to your local device. Tomorrow, we map your home watershed.");
-            }, 500);
+            updateAuditUI();
+            calculateAndUpdateChart();
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const checkLucide = setInterval(() => { if (typeof lucide !== 'undefined') { lucide.createIcons(); clearInterval(checkLucide); } }, 100);
-        });
+        // Update Text & Counters for Audit
+        function updateAuditUI() {
+            const counter = document.getElementById('selection-counter');
+            const shadowReveal = document.getElementById('shadow-reveal');
+            
+            counter.innerText = `Select up to 3 items (${state.selectedIds.length}/3 selected)`;
+
+            if (state.selectedIds.length === 0) {
+                shadowReveal.innerHTML = "Your invisible support team will appear here once you select your morning routine...";
+                shadowReveal.className = "flex-grow flex flex-col justify-center text-gray-600 italic text-center";
+            } else {
+                let html = '<ul class="space-y-4 text-left">';
+                state.selectedIds.forEach(id => {
+                    const act = activities.find(a => a.id === id);
+                    html += `<li class="text-sm text-gray-800 bg-white p-3 rounded-lg shadow-sm border border-gray-100"><span class="text-[#B95C3F] mr-2">&#x26A0;</span>${act.shadow}</li>`;
+                });
+                html += '</ul>';
+                shadowReveal.innerHTML = html;
+                shadowReveal.className = "flex-grow overflow-y-auto";
+            }
+        }
+
+        // Calculate Scores for Chart
+        function calculateAndUpdateChart() {
+            // Reset to baseline
+            let scores = { energy: 10, water: 10, food: 10, digital: 10 };
+            
+            state.selectedIds.forEach(id => {
+                const act = activities.find(a => a.id === id);
+                scores.energy += act.energy;
+                scores.water += act.water;
+                scores.food += act.food;
+                scores.digital += act.digital;
+            });
+
+            state.baseScores = scores;
+            updateChartDisplay();
+        }
+
+        // Chart.js Implementation
+        function initChart() {
+            const ctx = document.getElementById('dependencyChart').getContext('2d');
+            
+            // Chart.js requires specific config to respect CSS constraints
+            dependencyChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Energy Matrix', 'Water Systems', 'Food Chains', 'Digital Shadow'],
+                    datasets: [{
+                        data: [10, 10, 10, 10], // Init baseline
+                        backgroundColor: [
+                            '#B95C3F', // Terracotta
+                            '#4A90E2', // Blue
+                            '#6B8E6B', // Sage
+                            '#4A5568'  // Slate
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Critical for container adherence
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: { family: "'Segoe UI', sans-serif" }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    // 16-char logic / label wrapping requirement
+                                    let label = context.label || '';
+                                    if (label.length > 16) {
+                                        label = label.substring(0, 16) + '...';
+                                    }
+                                    return ` ${label}: ${context.parsed} Dependency Units`;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 800,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        }
+
+        // Update Chart visually based on state (Normal vs Paused)
+        function updateChartDisplay() {
+            if (!dependencyChartInstance) return;
+
+            let dataToShow = [
+                state.baseScores.energy,
+                state.baseScores.water,
+                state.baseScores.food,
+                state.baseScores.digital
+            ];
+
+            if (state.isPaused) {
+                // Simulate supply chain collapse (72 hours) - drastic reductions
+                dataToShow = [
+                    state.baseScores.energy * 0.1, // Power grid fails quickly
+                    state.baseScores.water * 0.4,  // Gravity fed might remain briefly
+                    state.baseScores.food * 0.1,   // Grocery stores empty in 3 days
+                    0                              // Digital stops without power/servers
+                ];
+            }
+
+            dependencyChartInstance.data.datasets[0].data = dataToShow;
+            dependencyChartInstance.update();
+        }
+
+        // Setup other Event Listeners
+        function setupEventListeners() {
+            // 72 Hour Toggle
+            const toggle = document.getElementById('pause-toggle');
+            const impactText = document.getElementById('pause-impact-text');
+            
+            toggle.addEventListener('change', (e) => {
+                state.isPaused = e.target.checked;
+                updateChartDisplay();
+                
+                // Add CSS logic for custom toggle visual movement
+                const dot = e.target.parentElement.querySelector('.dot');
+                if(state.isPaused) {
+                    dot.style.transform = 'translateX(100%)';
+                    impactText.classList.remove('hidden');
+                } else {
+                    dot.style.transform = 'translateX(0)';
+                    impactText.classList.add('hidden');
+                }
+            });
+
+            // Action Selector (Grain of Sand)
+            const actionSelector = document.getElementById('action-selector');
+            const actionResult = document.getElementById('action-result');
+
+            actionSelector.addEventListener('change', (e) => {
+                const choice = e.target.value;
+                if (localizationActions[choice]) {
+                    actionResult.innerText = localizationActions[choice];
+                    actionResult.classList.remove('hidden');
+                    // Small visual flash to draw attention
+                    actionResult.classList.add('bg-green-500/30');
+                    setTimeout(() => actionResult.classList.remove('bg-green-500/30'), 300);
+                }
+            });
+        }
     </script>
 </body>
 </html>
