@@ -3,376 +3,475 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Localization Assistant: Systemic Inventory</title>
-    
-    <!-- Chosen Palette: Warm Earth Neutrals (Stone Backgrounds, Sage Greens for Localization, Deep Terracotta for Shadow/Metacrisis, Muted Slate for Text) -->
-    
-    <!-- Application Structure Plan: 
-    The SPA is structured as a guided, interactive "Systemic Inventory" (Day 1 of the course). 
-    1. Hero/Intro: Reframes the "Elephant in the Room" as the Metacrisis.
-    2. Socratic Audit Module: Allows users to input their routine to reveal "Energy Blindness".
-    3. The Matrix vs. The Web (Data Dashboard): Visualizes hidden dependencies across 4 buckets.
-    4. 72-Hour Challenge: An interactive toggle illustrating "Ecological Overshoot".
-    5. Emotional Alchemy & Action: Guides the user from Solastalgia to a concrete action.
-    6. The Explorer's Library: Provides supporting links to foundational research and movements. -->
-    
-    <!-- Visualization & Content Choices: 
-    1. Morning Audit Grid -> Goal: Inform/Organize -> Viz: Interactive HTML Button Grid.
-    2. Dependency Footprint -> Goal: Compare -> Viz: Chart.js Doughnut Chart.
-    3. 72-Hour Supply Pause -> Goal: Change/Impact -> Viz: HTML/CSS Toggle.
-    4. Explorer's Library -> Goal: Organize -> Viz: Flexbox Link Cards -> Provides external grounding to the Localization Movement and Systems thinking.
-    * NO SVG or Mermaid JS used. All visual structure relies on Tailwind CSS, Unicode icons, and Canvas (Chart.js). -->
-    
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-
+    <title>Navigating The Great Simplification</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    <!-- Chosen Palette: Warm Neutrals (Off-white backgrounds #FAF9F6, Slate-800 text) with Emerald (#047857) for restorative concepts and Amber (#B45309) for energy/warning metrics. -->
+    <!-- Application Structure Plan: A linear, story-driven dashboard that guides the user through the "Diagnose, Orient, Act" framework. It begins with the macro-level biophysical reality (Energy & Overshoot), transitions to the cognitive impact (The Superorganism & Behavior), outlines the four-pillar strategic response (Head, Place, Heart, Hands), and concludes with an interactive synthesis tool (The Cosmic Equation). This structure prevents cognitive overwhelm by starting with the "why" and ending with practical, localized "how" and "what to do", optimizing for deep understanding. -->
+    <!-- Visualization & Content Choices: 
+        1. EROI & Carbon Pulse Chart (Chart.js): Goal is to visualize the invisible thermodynamic crisis. Mixed bar/line chart clearly contrasts rising consumption with falling energy returns. 
+        2. Dopamine/Superorganism Tool (Chart.js Donut + Slider): Goal is to show the behavioral trap. Interactive slider lets users see how hyper-novelty consumption cannibalizes ancestral/community bandwidth.
+        3. Framework Grid (HTML/Tailwind): Goal is to organize the complex response into manageable chunks. Clickable accordion cards reveal the Head, Place, Heart, Hands methodology.
+        4. Cosmic Equation Calculator (HTML/Vanilla JS): Goal is to make abstract philosophy actionable. Interactive sliders compute a "Legacy Score", applying the mathematical metaphor from the source text. 
+        All choices strictly avoid SVG/Mermaid in favor of Canvas and styled HTML to meet constraints. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
-        :root {
-            --bg-stone: #F7F5F0;
-            --text-slate: #2D3748;
-            --accent-sage: #6B8E6B;
-            --accent-terra: #B95C3F;
-            --muted-sand: #E5E0D8;
-        }
-
-        body {
-            background-color: var(--bg-stone);
-            color: var(--text-slate);
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
-
         .chart-container {
             position: relative;
             width: 100%;
-            max-width: 500px;
+            max-width: 650px;
             margin-left: auto;
             margin-right: auto;
-            height: 40vh;
-            min-height: 300px;
+            height: 320px;
             max-height: 400px;
         }
-
-        .audit-btn {
-            transition: all 0.2s ease-in-out;
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 380px;
+            }
         }
-        .audit-btn.selected {
-            background-color: var(--accent-sage);
-            color: white;
-            border-color: var(--accent-sage);
-            transform: scale(0.98);
+        body {
+            background-color: #FAF9F6;
+            color: #1E293B;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         }
-
-        .toggle-checkbox:checked {
-            right: 0;
-            border-color: var(--accent-terra);
-        }
-        .toggle-checkbox:checked + .toggle-label {
-            background-color: var(--accent-terra);
-        }
-
-        .resource-card:hover {
-            border-color: var(--accent-sage);
-            background-color: white;
-        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="antialiased pb-20">
+<body class="antialiased leading-relaxed selection:bg-emerald-200 selection:text-emerald-900">
 
-    <header class="bg-white shadow-sm sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="text-xl font-bold text-gray-800">
-                <span class="text-[#B95C3F]">&#x1F418;</span> The Localization Assistant
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">&#9875;</span>
+                    <span class="font-bold text-xl tracking-tight text-slate-900">The Great Simplification</span>
+                </div>
+                <div class="hidden md:flex space-x-8 text-sm font-semibold text-slate-600">
+                    <a href="#diagnosis" class="hover:text-emerald-700 transition">1. The Diagnosis</a>
+                    <a href="#behavior" class="hover:text-emerald-700 transition">2. The Human Trap</a>
+                    <a href="#response" class="hover:text-emerald-700 transition">3. The Bioregional Response</a>
+                    <a href="#action" class="hover:text-emerald-700 transition">4. Cosmic Equation</a>
+                </div>
             </div>
-            <div class="text-sm font-medium text-gray-500 uppercase tracking-wide">
-                Day 1: The Metacrisis
-            </div>
+        </div>
+    </nav>
+
+    <header class="max-w-4xl mx-auto px-6 pt-16 pb-12 text-center">
+        <div class="inline-block bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-6">Reality 101</div>
+        <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 leading-tight">Navigating the End of the Endless Summer</h1>
+        <p class="text-lg md:text-xl text-slate-600 mb-8">We are not facing a temporary glitch in the system; we are living through a profound civilizational bottleneck. To transition from the fragile "Industrial Titanic" to resilient local "Schooners," we must first cure our energy blindness.</p>
+        <div class="flex justify-center gap-4">
+            <a href="#diagnosis" class="bg-slate-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-slate-800 transition shadow-lg">Diagnose the System</a>
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 space-y-16">
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 space-y-24">
 
-        <!-- Phase 1: Meeting the New Elephant -->
-        <section class="text-center max-w-3xl mx-auto space-y-6">
-            <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight">Meet the New Elephant</h1>
-            <p class="text-lg md:text-xl text-gray-600 leading-relaxed">
-                In the old days, we worked on fixing our personal secrets. Today, the Elephant has grown—it fills the whole house. It’s the <strong>Metacrisis</strong>: the convergence of ecological, social, and economic breakdown. 
-            </p>
-            <p class="text-md text-gray-600">
-                Before we can act, we must see what's keeping you standing. True health is impossible in a sick system. It's time to shift from <em>"Me"</em> to <em>"We"</em>.
-            </p>
-        </section>
-
-        <!-- Phase 2: The Socratic Audit -->
-        <section class="bg-white rounded-2xl shadow-md p-6 md:p-10 border border-gray-100">
-            <div class="mb-8">
-                <h2 class="text-2xl font-bold text-gray-800 mb-3">1. The Routine Audit</h2>
-                <p class="text-gray-600 text-sm">
-                    <strong>Context:</strong> Most modern life operates in a state of "Energy Blindness". We touch things without seeing the vast, fragile systems supporting them. <a href="https://www.thegreatsimplification.com/" target="_blank" class="text-[#B95C3F] underline ml-1 hover:text-red-700">Learn about Energy Blindness</a>.
-                </p>
+        <section id="diagnosis" class="pt-8">
+            <div class="mb-10 text-center max-w-3xl mx-auto">
+                <span class="text-4xl mb-4 block">&#127758;</span>
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">The Diagnosis: Energy, EROI, and Overshoot</h2>
+                <p class="text-slate-600">The modern economy treats energy as a simple line item, blinding us to the fact that fossil hydrocarbons are the literal engine of civilization. We have burned through millions of years of ancient sunlight in a 250-year "Carbon Pulse." As the Energy Return on Investment (EROI) plummets, the massive, complex systems of the global economy are beginning to stutter under the thermodynamic weight of ecological overshoot.</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                <div>
-                    <h3 class="text-sm font-semibold uppercase text-gray-500 mb-4 tracking-wider">Morning Activities</h3>
-                    <div class="grid grid-cols-2 gap-3" id="activity-grid"></div>
-                    <div class="mt-4 text-sm text-gray-500" id="selection-counter">Select 3 items (0/3 selected)</div>
+            <div class="bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-slate-200">
+                <h3 class="text-xl font-bold mb-6 text-center">The Thermodynamic Squeeze</h3>
+                <div class="chart-container">
+                    <canvas id="eroiChart"></canvas>
                 </div>
-
-                <div class="bg-[#F7F5F0] rounded-xl p-6 border border-[#E5E0D8] h-full flex flex-col">
-                    <h3 class="text-sm font-semibold uppercase text-gray-500 mb-4 tracking-wider">Your Systemic Shadow</h3>
-                    <div id="shadow-reveal" class="flex-grow flex flex-col justify-center text-gray-600 italic text-center text-sm leading-relaxed">
-                        Your invisible support team will appear here once you select your morning routine...
+                <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-slate-600 bg-slate-50 p-6 rounded-2xl">
+                    <div>
+                        <strong class="text-slate-900 block mb-2">The Jevons Paradox</strong>
+                        Technological efficiency does not reduce resource use on a macroeconomic scale; it accelerates it. As we make systems more efficient, the Economic Superorganism reinvests those gains to extract more materials, compounding overshoot rather than solving it.
+                    </div>
+                    <div>
+                        <strong class="text-slate-900 block mb-2">The EROI Cliff</strong>
+                        Early in the 20th century, discovering oil required minimal energy (EROI > 100:1). Today, shale oil, deep-water drilling, and complex renewables offer drastically lower returns (< 15:1). It takes increasing amounts of energy simply to acquire energy, starving the broader economy of surplus.
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Phase 3: The Matrix vs The Web (Data Dashboard) -->
-        <section class="bg-white rounded-2xl shadow-md p-6 md:p-10 border border-gray-100">
-            <div class="mb-8">
-                <h2 class="text-2xl font-bold text-gray-800 mb-3">2. The "Matrix" vs. The "Web"</h2>
-                <p class="text-gray-600 text-sm">
-                    <strong>Context:</strong> This is the "Cosmic Credit Card" — <strong>Ecological Overshoot</strong>. We use nature faster than it regenerates. <a href="https://www.footprintnetwork.org/our-work/earth-overshoot-day/" target="_blank" class="text-[#B95C3F] underline ml-1 hover:text-red-700">See current Overshoot stats</a>.
-                </p>
+        <section id="behavior" class="pt-8">
+            <div class="mb-10 text-center max-w-3xl mx-auto">
+                <span class="text-4xl mb-4 block">&#129504;</span>
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">The Human Trap: The Dopamine Superhighway</h2>
+                <p class="text-slate-600">We do not just face an environmental crisis; we face a mismatch between our ancestral brains and a modern, high-throughput environment. The Economic Superorganism hijacks our evolutionary drives for status and novelty, trapping us on a "Dopamine Superhighway." This overstimulation creates a profound meaning crisis, making the slow, intergenerational work of bioregional resilience difficult to focus on.</p>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                <div class="w-full">
-                    <div class="chart-container">
-                        <canvas id="dependencyChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="space-y-6 bg-red-50 p-6 rounded-xl border border-red-100">
-                    <h3 class="text-xl font-bold text-[#B95C3F]">The 72-Hour Challenge</h3>
-                    <p class="text-gray-700 text-sm">What if the global supply chains you just mapped paused for 72 hours?</p>
+            <div class="bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-slate-200 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <h3 class="text-xl font-bold text-slate-900">Simulate Cognitive Capture</h3>
+                    <p class="text-sm text-slate-600">Adjust the slider to simulate the influx of supernormal stimuli (digital media, hyper-palatable food, 24/7 news). Watch how the brain's "bandwidth allocation" shifts away from deep connection toward short-term novelty processing.</p>
                     
-                    <div class="flex items-center justify-between w-full">
-                        <label for="pause-toggle" class="flex items-center cursor-pointer">
-                            <div class="relative">
-                                <input type="checkbox" id="pause-toggle" class="sr-only toggle-checkbox">
-                                <div class="block bg-gray-300 w-14 h-8 rounded-full toggle-label transition-colors"></div>
-                                <div class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition-transform"></div>
-                            </div>
-                            <div class="ml-3 text-gray-700 font-medium">Simulate Global Pause</div>
+                    <div class="pt-4">
+                        <label for="stimuliSlider" class="flex justify-between text-sm font-bold text-slate-700 mb-2">
+                            <span>Supernormal Stimuli Exposure</span>
+                            <span id="stimuliValue" class="text-amber-600">Medium</span>
                         </label>
+                        <input type="range" id="stimuliSlider" min="0" max="100" value="50" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-600">
                     </div>
 
-                    <div id="pause-impact-text" class="text-xs font-semibold text-red-800 hidden mt-4 p-4 bg-red-100 rounded-lg">
-                        Notice the collapse. Your "Energy" drops as fuel stocks halt. "Food" plummets as global shipping stops. What remains is your true local resilience.
+                    <div class="bg-amber-50 border border-amber-100 p-4 rounded-xl text-sm text-amber-900">
+                        <strong class="block mb-1">The Ghost of Dopamine Past</strong>
+                        <span id="dopamineFeedback">As exposure increases, our baseline for satisfaction rises. We require more and more throughput just to feel 'normal', blinding us to the ecological costs.</span>
                     </div>
+                </div>
+                
+                <div class="chart-container" style="height: 300px;">
+                    <canvas id="dopamineChart"></canvas>
                 </div>
             </div>
         </section>
 
-        <!-- Phase 4 & 5: Emotional Alchemy & Action -->
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="bg-gray-800 text-white rounded-2xl p-8 shadow-lg">
-                <div class="text-3xl mb-4">&#x1F30D;</div>
-                <h2 class="text-2xl font-bold mb-3">Reframing the Shadow</h2>
-                <p class="text-gray-300 text-sm mb-4">
-                    Feeling <em>Solastalgia</em>? That heavy feeling is a Systems Signal. Move from the Matrix to the Web using <strong>Active Hope</strong>. <a href="https://www.activehope.info/" target="_blank" class="text-blue-400 underline ml-1">Explore Active Hope</a>.
-                </p>
-                <p class="text-gray-100 font-medium italic border-l-4 border-gray-500 pl-4 py-2 text-sm">
-                    "saving oneself and saving the world are now the exact same dance."
-                </p>
+        <section id="response" class="pt-8">
+            <div class="mb-10 text-center max-w-3xl mx-auto">
+                <span class="text-4xl mb-4 block">&#128200;</span>
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">The Bioregional Blueprint</h2>
+                <p class="text-slate-600">We cannot wait for top-down technological salvation to protect us from civilizational descent. The response to the Metacrisis must be scaled to the watershed and the community. By applying the "Head, Place, Heart, Hands" framework, we can build localized, regenerative lifeboats capable of weathering the Great Simplification.</p>
             </div>
 
-            <div class="bg-[#6B8E6B] text-white rounded-2xl p-8 shadow-lg flex flex-col justify-between">
-                <div>
-                    <div class="text-3xl mb-4">&#x1F331;</div>
-                    <h2 class="text-2xl font-bold mb-3">The "Grain of Sand" Task</h2>
-                    <p class="text-green-100 text-sm mb-4">Rebuilding systemic trust starts where you stand. Which system will you begin localizing today?</p>
-                    
-                    <select id="action-selector" class="w-full mt-2 p-3 rounded-lg bg-white text-gray-800 focus:outline-none text-sm">
-                        <option value="" disabled selected>Select a fragile system to localize...</option>
-                        <option value="energy">Energy (Heating, Electricity)</option>
-                        <option value="water">Water (Watersheds, Usage)</option>
-                        <option value="food">Food (Supply chains, Groceries)</option>
-                        <option value="digital">Digital (Screen time, Devices)</option>
-                    </select>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                    <button class="w-full text-left p-6 bg-slate-50 hover:bg-slate-100 transition focus:outline-none" onclick="toggleAccordion('acc-head')">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-bold text-slate-900">1. Head: The Diagnosis</h3>
+                            <span class="text-2xl text-slate-400 font-mono">+</span>
+                        </div>
+                    </button>
+                    <div id="acc-head" class="p-6 border-t border-slate-100 hidden">
+                        <p class="text-sm text-slate-600 mb-4">Unbolting from the Titanic requires cognitive clarity. We must adopt "Wide-Boundary Thinking" to see how energy, the economy, and the biosphere interrelate.</p>
+                        <ul class="text-sm text-slate-700 space-y-2 list-disc pl-5 marker:text-slate-400">
+                            <li>Recognize the Sunk Cost of the "Endless Summer" progress narrative.</li>
+                            <li>Accept that "Away" does not exist; waste cycles back into the biosphere.</li>
+                            <li>Understand that the Superorganism prioritizes power over life.</li>
+                        </ul>
+                    </div>
                 </div>
-                <div id="action-result" class="mt-6 text-sm font-bold bg-white/20 p-4 rounded-lg hidden"></div>
+
+                <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                    <button class="w-full text-left p-6 bg-slate-50 hover:bg-slate-100 transition focus:outline-none" onclick="toggleAccordion('acc-place')">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-bold text-slate-900">2. Place: The Explorer</h3>
+                            <span class="text-2xl text-slate-400 font-mono">+</span>
+                        </div>
+                    </button>
+                    <div id="acc-place" class="p-6 border-t border-slate-100 hidden">
+                        <p class="text-sm text-slate-600 mb-4">Redefining our address from political zip codes to ecological realities. Reinhabitation is the practice of becoming truly native to your bioregion.</p>
+                        <ul class="text-sm text-slate-700 space-y-2 list-disc pl-5 marker:text-blue-500">
+                            <li>Map your local watershed and the geological chassis beneath your feet.</li>
+                            <li>Conduct a Flora & Fauna census to know your non-human neighbors.</li>
+                            <li>Embrace Traditional Ecological Knowledge (TEK) to understand place-based stewardship.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                    <button class="w-full text-left p-6 bg-slate-50 hover:bg-slate-100 transition focus:outline-none" onclick="toggleAccordion('acc-heart')">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-bold text-slate-900">3. Heart: The Compass</h3>
+                            <span class="text-2xl text-slate-400 font-mono">+</span>
+                        </div>
+                    </button>
+                    <div id="acc-heart" class="p-6 border-t border-slate-100 hidden">
+                        <p class="text-sm text-slate-600 mb-4">Navigating the psychological toll of descent. We must metabolize "Solastalgia" (the grief of losing a home while still in it) to avoid collapse paralysis.</p>
+                        <ul class="text-sm text-slate-700 space-y-2 list-disc pl-5 marker:text-rose-500">
+                            <li>Practice <strong>Active Hope</strong>: not a feeling, but a daily, deliberate muscle.</li>
+                            <li>Cultivate <strong>Revolutionary Love</strong> to metabolize social friction and polarization.</li>
+                            <li>Adopt a "Post-Tragic" orientation: accepting limits while acting with joyful agency.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                    <button class="w-full text-left p-6 bg-slate-50 hover:bg-slate-100 transition focus:outline-none" onclick="toggleAccordion('acc-hands')">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-bold text-slate-900">4. Hands: The Lifeboat</h3>
+                            <span class="text-2xl text-slate-400 font-mono">+</span>
+                        </div>
+                    </button>
+                    <div id="acc-hands" class="p-6 border-t border-slate-100 hidden">
+                        <p class="text-sm text-slate-600 mb-4">The gritty, physical work of the descent. Transitioning from isolated consumers to interdependent community mechanics.</p>
+                        <ul class="text-sm text-slate-700 space-y-2 list-disc pl-5 marker:text-emerald-500">
+                            <li><strong>Rebuild the Soil Sponge:</strong> Slow, spread, and sink water to buffer climate whiplash.</li>
+                            <li><strong>Create the Commons:</strong> Establish tool libraries, crop swaps, and local credit systems.</li>
+                            <li>Commit to the <strong>9-by-21 Challenge</strong>: tangible bioregional actions executed locally.</li>
+                        </ul>
+                    </div>
+                </div>
+
             </div>
         </section>
 
-        <!-- New Section: The Explorer's Library (Supporting Links) -->
-        <section class="pt-10 border-t border-gray-200">
-            <h2 class="text-3xl font-extrabold text-gray-900 mb-8 text-center">The Explorer’s Library</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Resource 1 -->
-                <a href="https://www.localfutures.org/" target="_blank" class="resource-card group p-6 bg-[#F7F5F0] rounded-xl border-2 border-transparent transition-all shadow-sm flex flex-col h-full">
-                    <div class="text-sm font-bold text-[#6B8E6B] mb-2 uppercase tracking-tighter">Localization Strategy</div>
-                    <h3 class="text-lg font-bold text-gray-800 group-hover:text-[#6B8E6B]">Local Futures</h3>
-                    <p class="text-gray-600 text-xs mt-2 flex-grow leading-relaxed">The global movement for economic localization founded by Helena Norberg-Hodge.</p>
-                    <div class="mt-4 text-[#B95C3F] font-bold text-xs uppercase">&#x2192; Visit Site</div>
-                </a>
-                <!-- Resource 2 -->
-                <a href="https://www.activehope.info/" target="_blank" class="resource-card group p-6 bg-[#F7F5F0] rounded-xl border-2 border-transparent transition-all shadow-sm flex flex-col h-full">
-                    <div class="text-sm font-bold text-[#6B8E6B] mb-2 uppercase tracking-tighter">Inner Resilience</div>
-                    <h3 class="text-lg font-bold text-gray-800 group-hover:text-[#6B8E6B]">Active Hope</h3>
-                    <p class="text-gray-600 text-xs mt-2 flex-grow leading-relaxed">The psychological framework of Joanna Macy for facing the planetary crisis without burnout.</p>
-                    <div class="mt-4 text-[#B95C3F] font-bold text-xs uppercase">&#x2192; Visit Site</div>
-                </a>
-                <!-- Resource 3 -->
-                <a href="https://www.thegreatsimplification.com/" target="_blank" class="resource-card group p-6 bg-[#F7F5F0] rounded-xl border-2 border-transparent transition-all shadow-sm flex flex-col h-full">
-                    <div class="text-sm font-bold text-[#6B8E6B] mb-2 uppercase tracking-tighter">Systems Science</div>
-                    <h3 class="text-lg font-bold text-gray-800 group-hover:text-[#6B8E6B]">The Great Simplification</h3>
-                    <p class="text-gray-600 text-xs mt-2 flex-grow leading-relaxed">Nate Hagens' exploration of energy, money, and the human predicament.</p>
-                    <div class="mt-4 text-[#B95C3F] font-bold text-xs uppercase">&#x2192; Visit Site</div>
-                </a>
-                <!-- Resource 4 -->
-                <a href="https://gaiaeducation.org/" target="_blank" class="resource-card group p-6 bg-[#F7F5F0] rounded-xl border-2 border-transparent transition-all shadow-sm flex flex-col h-full">
-                    <div class="text-sm font-bold text-[#6B8E6B] mb-2 uppercase tracking-tighter">Regenerative Design</div>
-                    <h3 class="text-lg font-bold text-gray-800 group-hover:text-[#6B8E6B]">Gaia Education</h3>
-                    <p class="text-gray-600 text-xs mt-2 flex-grow leading-relaxed">Design tools for social, ecological, and economic sustainability.</p>
-                    <div class="mt-4 text-[#B95C3F] font-bold text-xs uppercase">&#x2192; Visit Site</div>
-                </a>
+        <section id="action" class="pt-8">
+            <div class="mb-10 text-center max-w-3xl mx-auto">
+                <span class="text-4xl mb-4 block">&#127809;</span>
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">Life's Cosmic Equation 2.0</h2>
+                <p class="text-slate-600">To survive the Metacrisis, we must update the math of our lives from "Self-Help" to "Systems-Health." The original equation of personal success has been rewritten for planetary survival. Adjust your local inputs below to see your potential Cosmic Legacy.</p>
+            </div>
+
+            <div class="bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-slate-200">
+                <div class="overflow-x-auto py-6 mb-8 bg-slate-50 rounded-2xl border border-slate-100 text-center">
+                    <div class="text-lg md:text-xl text-slate-800">
+                        $$ \text{Legacy} = (\text{Biophilic Energy} + \text{Postgrowth Mindset} + \text{Radical Hope}) \times \text{Deep Time} $$
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    <div class="space-y-8">
+                        <div>
+                            <label class="flex justify-between text-sm font-bold text-slate-700 mb-1">
+                                <span>Biophilic Energy (BE)</span>
+                                <span id="beVal" class="text-emerald-600">5</span>
+                            </label>
+                            <p class="text-xs text-slate-500 mb-2">Redirecting your unique talent from extraction to ecological/community restoration.</p>
+                            <input type="range" id="beSlider" min="0" max="10" value="5" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600">
+                        </div>
+
+                        <div>
+                            <label class="flex justify-between text-sm font-bold text-slate-700 mb-1">
+                                <span>Postgrowth Mindset (PM)</span>
+                                <span id="pmVal" class="text-blue-600">5</span>
+                            </label>
+                            <p class="text-xs text-slate-500 mb-2">Decoupling from infinite consumption. Choosing sufficiency over expansion.</p>
+                            <input type="range" id="pmSlider" min="0" max="10" value="5" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                        </div>
+
+                        <div>
+                            <label class="flex justify-between text-sm font-bold text-slate-700 mb-1">
+                                <span>Radical Hope (RH)</span>
+                                <span id="rhVal" class="text-rose-600">5</span>
+                            </label>
+                            <p class="text-xs text-slate-500 mb-2">The courage to act with integrity and plant trees whose shade you will never sit under.</p>
+                            <input type="range" id="rhSlider" min="0" max="10" value="5" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-rose-600">
+                        </div>
+
+                        <div>
+                            <label class="flex justify-between text-sm font-bold text-slate-700 mb-1">
+                                <span>Deep Time (DT) Multiplier</span>
+                                <span id="dtVal" class="text-indigo-600">x 5</span>
+                            </label>
+                            <p class="text-xs text-slate-500 mb-2">Filtering daily choices by their impact on the next seven generations.</p>
+                            <input type="range" id="dtSlider" min="1" max="10" value="5" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col justify-center items-center bg-slate-900 text-white p-8 rounded-3xl relative overflow-hidden">
+                        <div class="z-10 text-center">
+                            <h4 class="text-sm uppercase tracking-widest text-slate-400 font-bold mb-2">Your Bioregional Legacy Score</h4>
+                            <div id="legacyScore" class="text-6xl md:text-7xl font-extrabold text-emerald-400 mb-4 transition-all duration-300">75</div>
+                            <p id="legacyFeedback" class="text-sm text-slate-300 max-w-xs mx-auto">You are beginning to step out of the matrix. Increase your systemic inputs to build a lasting island of coherence.</p>
+                        </div>
+                        <div id="legacyFill" class="absolute bottom-0 left-0 w-full bg-emerald-800 opacity-30 transition-all duration-500" style="height: 25%;"></div>
+                    </div>
+                </div>
             </div>
         </section>
 
     </main>
 
+    <footer class="bg-slate-900 text-slate-400 py-12 border-t border-slate-800 text-center">
+        <div class="max-w-4xl mx-auto px-6">
+            <span class="text-3xl block mb-4">&#9875;</span>
+            <h3 class="text-xl text-white font-bold mb-4">The era of the solitary consumer is ending.</h3>
+            <p class="text-sm mb-8 max-w-2xl mx-auto">We cannot save the global industrial machine, but we can absolutely build a world that floats. Pick up a shovel, map your watershed, and meet your neighbors.</p>
+            <p class="text-xs uppercase tracking-widest text-slate-500">Based on the research of Nate Hagens & The Localization Movement</p>
+        </div>
+    </footer>
+
     <script>
-        const activities = [
-            { id: 'coffee', name: '&#x2615; Make Coffee', energy: 20, water: 30, food: 40, digital: 0, shadow: "Coffee: Relying on tropical soil, global shipping, and energy grids." },
-            { id: 'phone', name: '&#x1F4F1; Check Phone', energy: 10, water: 10, food: 0, digital: 50, shadow: "Phone: Extraction of rare minerals and server-farm energy." },
-            { id: 'heat', name: '&#x1F321; Turn on Heat', energy: 50, water: 0, food: 0, digital: 10, shadow: "Heating: Drawing down geological stocks of carbon flows." },
-            { id: 'shower', name: '&#x1F6BF; Hot Shower', energy: 30, water: 50, food: 0, digital: 0, shadow: "Shower: Dependent on distant watersheds and treatment plants." },
-            { id: 'drive', name: '&#x1F697; Start Car', energy: 50, water: 0, food: 0, digital: 10, shadow: "Car: Massive infrastructure and global oil dependency." },
-            { id: 'breakfast', name: '&#x1F373; Eat Breakfast', energy: 10, water: 20, food: 40, digital: 0, shadow: "Food: Average meals travel 1,500 miles before your plate." }
-        ];
-
-        const localizationActions = {
-            energy: "Your Grain of Sand: Do a home 'Phantom Power' audit today. Unplug 3 unused electronics.",
-            water: "Your Grain of Sand: Find out exactly which watershed your tap water comes from today.",
-            food: "Your Grain of Sand: Commit to buying one staple item locally (within 100 miles) this week.",
-            digital: "Your Grain of Sand: Implement a 12-hour digital Sabbath this weekend. Walk your bioregion."
-        };
-
-        let state = { selectedIds: [], isPaused: false, baseScores: { energy: 10, water: 10, food: 10, digital: 10 } };
-        let dependencyChartInstance = null;
-
-        document.addEventListener('DOMContentLoaded', () => {
-            renderActivityGrid();
-            initChart();
-            setupEventListeners();
-        });
-
-        function renderActivityGrid() {
-            const grid = document.getElementById('activity-grid');
-            activities.forEach(act => {
-                const btn = document.createElement('button');
-                btn.className = 'audit-btn w-full text-left px-4 py-3 rounded-xl border-2 border-gray-200 text-gray-700 font-medium hover:border-[#6B8E6B] focus:outline-none text-xs';
-                btn.innerHTML = act.name;
-                btn.onclick = () => toggleActivity(act.id, btn);
-                grid.appendChild(btn);
-            });
-        }
-
-        function toggleActivity(id, btnElement) {
-            const index = state.selectedIds.indexOf(id);
-            if (index > -1) {
-                state.selectedIds.splice(index, 1);
-                btnElement.classList.remove('selected');
-            } else if (state.selectedIds.length < 3) {
-                state.selectedIds.push(id);
-                btnElement.classList.add('selected');
-            }
-            updateAuditUI();
-            calculateAndUpdateChart();
-        }
-
-        function updateAuditUI() {
-            const counter = document.getElementById('selection-counter');
-            const shadowReveal = document.getElementById('shadow-reveal');
-            counter.innerText = `Select up to 3 items (${state.selectedIds.length}/3 selected)`;
-            if (state.selectedIds.length === 0) {
-                shadowReveal.innerHTML = "Your invisible support team will appear here once you select your morning routine...";
+        // --- Accordion Logic ---
+        function toggleAccordion(id) {
+            const el = document.getElementById(id);
+            const btn = el.previousElementSibling;
+            const icon = btn.querySelector('span');
+            
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                icon.textContent = '-';
             } else {
-                let html = '<ul class="space-y-4 text-left">';
-                state.selectedIds.forEach(id => {
-                    const act = activities.find(a => a.id === id);
-                    html += `<li class="text-xs text-gray-800 bg-white p-3 rounded-lg shadow-sm border border-gray-100"><span class="text-[#B95C3F] mr-2">&#x26A0;</span>${act.shadow}</li>`;
-                });
-                html += '</ul>';
-                shadowReveal.innerHTML = html;
+                el.classList.add('hidden');
+                icon.textContent = '+';
             }
         }
 
-        function calculateAndUpdateChart() {
-            let scores = { energy: 10, water: 10, food: 10, digital: 10 };
-            state.selectedIds.forEach(id => {
-                const act = activities.find(a => a.id === id);
-                scores.energy += act.energy; scores.water += act.water; scores.food += act.food; scores.digital += act.digital;
-            });
-            state.baseScores = scores;
-            updateChartDisplay();
-        }
-
-        function initChart() {
-            const ctx = document.getElementById('dependencyChart').getContext('2d');
-            dependencyChartInstance = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Energy Matrix', 'Water Systems', 'Food Chains', 'Digital Shadow'],
-                    datasets: [{
-                        data: [10, 10, 10, 10],
-                        backgroundColor: ['#B95C3F', '#4A90E2', '#6B8E6B', '#4A5568'],
-                        borderWidth: 2, borderColor: '#ffffff'
-                    }]
+        // --- Chart.js: EROI & Carbon Pulse ---
+        const ctxEroi = document.getElementById('eroiChart').getContext('2d');
+        const eroiChart = new Chart(ctxEroi, {
+            type: 'bar',
+            data: {
+                labels: ['1850', '1900', '1950', '1980', '2000', '2025', '2050 (Proj)'],
+                datasets: [
+                    {
+                        type: 'line',
+                        label: 'EROI Ratio (Net Energy)',
+                        data: [50, 100, 80, 40, 20, 12, 5],
+                        borderColor: '#047857',
+                        backgroundColor: '#047857',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        yAxisID: 'y1'
+                    },
+                    {
+                        type: 'bar',
+                        label: 'Global Energy Consumption (EJ)',
+                        data: [20, 40, 100, 280, 400, 600, 450],
+                        backgroundColor: '#B4530980',
+                        borderColor: '#B45309',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        yAxisID: 'y'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { position: 'top', labels: { color: '#475569', font: { family: 'system-ui' } } },
+                    tooltip: { backgroundColor: '#1E293B', titleFont: { size: 13 }, bodyFont: { size: 13 }, padding: 10, cornerRadius: 8 }
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { padding: 15, font: { size: 10 } } },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.label || '';
-                                    if (label.length > 16) label = label.substring(0, 16) + '...';
-                                    return ` ${label}: ${context.parsed}`;
-                                }
-                            }
-                        }
+                scales: {
+                    x: { grid: { display: false }, ticks: { color: '#64748B' } },
+                    y: { 
+                        type: 'linear', display: true, position: 'left',
+                        title: { display: true, text: 'Consumption', color: '#B45309', font: { weight: 'bold' } },
+                        ticks: { color: '#64748B' }
+                    },
+                    y1: { 
+                        type: 'linear', display: true, position: 'right',
+                        title: { display: true, text: 'EROI Ratio', color: '#047857', font: { weight: 'bold' } },
+                        grid: { drawOnChartArea: false },
+                        ticks: { color: '#64748B' }
                     }
                 }
-            });
-        }
-
-        function updateChartDisplay() {
-            if (!dependencyChartInstance) return;
-            let dataToShow = [state.baseScores.energy, state.baseScores.water, state.baseScores.food, state.baseScores.digital];
-            if (state.isPaused) {
-                dataToShow = [state.baseScores.energy * 0.1, state.baseScores.water * 0.4, state.baseScores.food * 0.1, 0];
             }
-            dependencyChartInstance.data.datasets[0].data = dataToShow;
-            dependencyChartInstance.update();
+        });
+
+        // --- Chart.js: Dopamine Superhighway ---
+        const ctxDopamine = document.getElementById('dopamineChart').getContext('2d');
+        const dopamineData = {
+            labels: ['Supernormal Stimuli (Screens/Status)', 'Ancestral Needs (Nature/Community)', 'Deep Thinking (Systems)'],
+            datasets: [{
+                data: [50, 40, 10],
+                backgroundColor: ['#B45309', '#047857', '#3B82F6'],
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        };
+        const dopamineChart = new Chart(ctxDopamine, {
+            type: 'doughnut',
+            data: dopamineData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#475569', font: { family: 'system-ui' }, padding: 20 } },
+                    tooltip: { backgroundColor: '#1E293B', bodyFont: { size: 14 }, padding: 10, cornerRadius: 8 }
+                }
+            }
+        });
+
+        // Slider interaction for Dopamine Chart
+        const stimuliSlider = document.getElementById('stimuliSlider');
+        const stimuliValue = document.getElementById('stimuliValue');
+        const dopamineFeedback = document.getElementById('dopamineFeedback');
+
+        stimuliSlider.addEventListener('input', (e) => {
+            const val = parseInt(e.target.value);
+            
+            // Update labels
+            if(val < 33) { stimuliValue.textContent = "Low"; stimuliValue.className = "text-emerald-600"; }
+            else if(val < 66) { stimuliValue.textContent = "Moderate"; stimuliValue.className = "text-amber-600"; }
+            else { stimuliValue.textContent = "High (Overshoot)"; stimuliValue.className = "text-rose-600"; }
+
+            // Update feedback text
+            if(val < 30) {
+                dopamineFeedback.textContent = "Your nervous system is regulated. You have bandwidth to process deep time, community needs, and systemic resilience.";
+            } else if (val < 70) {
+                dopamineFeedback.textContent = "As exposure increases, our baseline for satisfaction rises. We require more throughput just to feel 'normal', blinding us to ecological costs.";
+            } else {
+                dopamineFeedback.textContent = "Cognitive capture. The Superorganism has hijacked your attention. Long-term systemic risks are completely ignored in favor of immediate dopamine hits.";
+            }
+
+            // Update chart data dynamically
+            const ancestral = Math.max(5, 80 - (val * 0.8));
+            const deepThinking = Math.max(2, 20 - (val * 0.2));
+            const supernormal = val;
+
+            dopamineChart.data.datasets[0].data = [supernormal, ancestral, deepThinking];
+            dopamineChart.update();
+        });
+
+        // --- Cosmic Equation Logic ---
+        const beSlider = document.getElementById('beSlider');
+        const pmSlider = document.getElementById('pmSlider');
+        const rhSlider = document.getElementById('rhSlider');
+        const dtSlider = document.getElementById('dtSlider');
+        
+        const beVal = document.getElementById('beVal');
+        const pmVal = document.getElementById('pmVal');
+        const rhVal = document.getElementById('rhVal');
+        const dtVal = document.getElementById('dtVal');
+        
+        const legacyScoreDisplay = document.getElementById('legacyScore');
+        const legacyFeedback = document.getElementById('legacyFeedback');
+        const legacyFill = document.getElementById('legacyFill');
+
+        function updateEquation() {
+            const be = parseInt(beSlider.value);
+            const pm = parseInt(pmSlider.value);
+            const rh = parseInt(rhSlider.value);
+            const dt = parseInt(dtSlider.value);
+
+            beVal.textContent = be;
+            pmVal.textContent = pm;
+            rhVal.textContent = rh;
+            dtVal.textContent = "x " + dt;
+
+            // (BE + PM + RH) * DT. Max score = (10+10+10)*10 = 300
+            const score = (be + pm + rh) * dt;
+            legacyScoreDisplay.textContent = score;
+
+            // Visual Fill
+            const percentage = (score / 300) * 100;
+            legacyFill.style.height = `${percentage}%`;
+
+            // Feedback Logic
+            if (score === 0) {
+                legacyFeedback.textContent = "Zero impact. You are a passive passenger on the Titanic, entirely consumed by the matrix.";
+                legacyScoreDisplay.className = "text-6xl md:text-7xl font-extrabold text-slate-500 mb-4 transition-all duration-300";
+            } else if (score < 100) {
+                legacyFeedback.textContent = "You are beginning to awaken. Small localized actions are starting to form an island of coherence.";
+                legacyScoreDisplay.className = "text-6xl md:text-7xl font-extrabold text-amber-400 mb-4 transition-all duration-300";
+            } else if (score < 200) {
+                legacyFeedback.textContent = "Strong bioregional stewardship. You are actively building the Soil Sponge and weaving systemic trust.";
+                legacyScoreDisplay.className = "text-6xl md:text-7xl font-extrabold text-blue-400 mb-4 transition-all duration-300";
+            } else {
+                legacyFeedback.textContent = "Profound legacy. You are a 'Mitochondria' of the new culture, creating regenerative systems for the 2126 generation.";
+                legacyScoreDisplay.className = "text-6xl md:text-7xl font-extrabold text-emerald-400 mb-4 transition-all duration-300";
+            }
         }
 
-        function setupEventListeners() {
-            const toggle = document.getElementById('pause-toggle');
-            const impactText = document.getElementById('pause-impact-text');
-            toggle.addEventListener('change', (e) => {
-                state.isPaused = e.target.checked;
-                updateChartDisplay();
-                const dot = e.target.parentElement.querySelector('.dot');
-                if(state.isPaused) { dot.style.transform = 'translateX(100%)'; impactText.classList.remove('hidden'); }
-                else { dot.style.transform = 'translateX(0)'; impactText.classList.add('hidden'); }
-            });
-            const actionSelector = document.getElementById('action-selector');
-            const actionResult = document.getElementById('action-result');
-            actionSelector.addEventListener('change', (e) => {
-                const choice = e.target.value;
-                if (localizationActions[choice]) {
-                    actionResult.innerText = localizationActions[choice];
-                    actionResult.classList.remove('hidden');
-                }
-            });
-        }
+        [beSlider, pmSlider, rhSlider, dtSlider].forEach(slider => {
+            slider.addEventListener('input', updateEquation);
+        });
+
+        // Initialize
+        updateEquation();
+
     </script>
 </body>
 </html>
